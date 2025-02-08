@@ -59,16 +59,16 @@ class ConfigManager:
         if 'service_account_key_path' not in gcp_config:
             raise ValueError("GCP service account key path not configured")
         
-        # Get absolute path for service account key
-        if not os.path.isabs(gcp_config['service_account_key_path']):
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            gcp_config['service_account_key_path'] = os.path.join(
-                base_dir,
-                gcp_config['service_account_key_path']
-            )
+        # Find any JSON file in credentials directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        credentials_dir = os.path.join(base_dir, 'credentials')
+        json_files = [f for f in os.listdir(credentials_dir) if f.endswith('.json')]
         
-        if not os.path.exists(gcp_config['service_account_key_path']):
-            raise ValueError(f"GCP service account key file not found: {gcp_config['service_account_key_path']}")
+        if not json_files:
+            raise ValueError("No service account key files found in credentials directory")
+        
+        # Use the first JSON file found
+        gcp_config['service_account_key_path'] = os.path.join(credentials_dir, json_files[0])
 
         # Set default logging config
         logging_config = self.config['logging']
