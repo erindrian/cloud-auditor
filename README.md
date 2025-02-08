@@ -1,4 +1,4 @@
-# Cloud Security Auditor
+# Cloud Auditor
 
 A Python-based tool for auditing cloud security configurations in GCP environments. The tool scans cloud resources for security misconfigurations, generates detailed reports, and sends notifications through multiple channels.
 
@@ -33,8 +33,8 @@ A Python-based tool for auditing cloud security configurations in GCP environmen
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/cloud-security-auditor.git
-cd cloud-security-auditor
+git clone https://github.com/yourusername/cloud-auditor.git
+cd cloud-auditor
 ```
 
 2. Install dependencies:
@@ -128,26 +128,39 @@ tail -f logs/app.log
 ## Project Structure
 
 ```
-cloud-security-auditor/
+cloud-auditor/
+├── credentials/           # Secure storage for credentials and keys
+├── logs/                 # Application logs
+│   └── app.log
+├── reports/              # Generated compliance reports
 ├── src/
 │   ├── config/
 │   │   └── config.yaml
 │   ├── modules/
+│   │   ├── __init__.py
 │   │   ├── scanner.py
 │   │   ├── reporter.py
 │   │   └── notifier.py
 │   ├── utils/
+│   │   ├── __init__.py
 │   │   ├── config_manager.py
 │   │   ├── logger.py
 │   │   └── cis_benchmark_library.py
-│   └── main.py
+│   ├── __init__.py
+│   ├── check_path.py
+│   ├── main.py
+│   ├── simple_test.py
+│   └── test_script.py
 ├── tests/
 │   ├── test_scanner.py
 │   ├── test_reporter.py
 │   └── test_notifier.py
-├── logs/
-├── reports/
+├── import_test.py
+├── minimal_test.py
+├── pytest.ini
 ├── requirements.txt
+├── run.sh
+├── test_imports.py
 └── README.md
 ```
 
