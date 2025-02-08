@@ -1,0 +1,9 @@
+Finding Description,CIS Control ID,Profile Applicability,Risk Level,Resource ID,Resource Type,Remediation Steps,Impact,Details
+Bucket misconfigured_public_bucket is publicly accessible,5.1,Level 1,High,misconfigured_public_bucket,storage_bucket,"
+        1. Go to Cloud Storage in the Cloud Console
+        2. Select the bucket with public access
+        3. Go to Permissions tab
+        4. Remove 'allUsers' and 'allAuthenticatedUsers' members
+        5. Enable uniform bucket-level access
+        6. Set public access prevention to 'enforced'
+        ",High - Allows anyone on the internet to access bucket content,"{'public_access_prevention': 'inherited', 'uniform_bucket_level_access': False}"

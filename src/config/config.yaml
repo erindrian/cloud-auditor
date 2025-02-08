@@ -1,0 +1,36 @@
+gcp:
+  service_account_key_path: credentials/test-project-450103-5848b7183463.json
+  project_id: test-project-450103
+
+logging:
+  level: DEBUG
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/app.log
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+notifications:
+  smtp:
+    enabled: false
+    sender_email: ${SMTP_SENDER_EMAIL}
+    receiver_email: ${SMTP_RECEIVER_EMAIL}
+    server: ${SMTP_SERVER}
+    port: ${SMTP_PORT:-587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    
+  slack:
+    enabled: false
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: ${SLACK_CHANNEL}
+
+scanner:
+  max_workers: 3
+  timeout: 30
+  batch_size: 100
+
+reporter:
+  output_dir: reports
+  formats:
+    - csv
+    - json
