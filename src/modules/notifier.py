@@ -6,6 +6,9 @@ import traceback
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Any, Dict, List, Optional
+# Optional imports for ticketing systems
+JIRA = None
+pysnow = None
 from src.utils.logger import Logger
 from src.utils.cis_benchmark_library import CIS_BENCHMARK_LIBRARY
 
@@ -147,6 +150,63 @@ class NotificationTemplate:
             "blocks": blocks
         }
 
+    @staticmethod
+    def generate_jira_issue(finding: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate JIRA issue fields for a finding."""
+        benchmark = next((b for b in finding.get('benchmarks', []) if b['id'] == finding['cis_id']), None)
+        
+        description = f"""
+h2. Security Finding Details
+* Description: {finding['description']}
+* Risk Level: {finding['risk_level']}
+* Resource: {finding['resource_type']} ({finding['resource_id']})
+* CIS Benchmark: {finding['cis_id']}
+
+h2. Remediation Steps
+{chr(10).join(['* ' + step for step in finding.get('remediation_steps', [])])}
+
+h2. Technical Details
+{str(finding.get('details', 'No additional details'))}
+"""
+
+        return {
+            'project': {'key': config['project_key']},
+            'summary': f"[Security] {finding['description']}",
+            'description': description,
+            'issuetype': {'name': config['issue_type']},
+            config['priority_field']: {'name': config['priority_mapping'].get(finding['risk_level'], 'Medium')},
+            'labels': config['labels'].split(',') if isinstance(config['labels'], str) else config['labels']
+        }
+
+    @staticmethod
+    def generate_servicenow_ticket(finding: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate ServiceNow ticket fields for a finding."""
+        description = f"""
+Security Finding Details
+-----------------------
+Description: {finding['description']}
+Risk Level: {finding['risk_level']}
+Resource: {finding['resource_type']} ({finding['resource_id']})
+CIS Benchmark: {finding['cis_id']}
+
+Remediation Steps
+----------------
+{chr(10).join(['- ' + step for step in finding.get('remediation_steps', [])])}
+
+Technical Details
+---------------
+{str(finding.get('details', 'No additional details'))}
+"""
+
+        return {
+            'short_description': f"[Security] {finding['description']}",
+            'description': description,
+            'assignment_group': config['assignment_group'],
+            'category': config['category'],
+            'urgency': config['urgency_mapping'].get(finding['risk_level'], 3),
+            'impact': config['urgency_mapping'].get(finding['risk_level'], 3)
+        }
+
 class Notifier:
     def __init__(self, config_manager: Any):
         """Initialize the notifier with configuration."""
@@ -211,6 +271,79 @@ class Notifier:
                             extra={"error": str(e), "stack_trace": traceback.format_exc()})
             raise
 
+    async def _create_jira_issues(self, findings: List[Dict[str, Any]]) -> None:
+        """Create JIRA issues for findings."""
+        logger = self._get_logger()
+        try:
+            jira_config = self.config['notifications']['jira']
+            if not jira_config['enabled']:
+                logger.info("JIRA integration is disabled")
+                return
+
+            # Import JIRA only when needed
+            try:
+                from jira import JIRA
+            except ImportError:
+                logger.warning("JIRA package not installed. Install with: pip install jira")
+                return
+
+            jira = JIRA(
+                server=jira_config['url'],
+                basic_auth=(jira_config['username'], jira_config['api_token'])
+            )
+
+            for finding in findings:
+                issue_fields = NotificationTemplate.generate_jira_issue(finding, jira_config)
+                issue = jira.create_issue(fields=issue_fields)
+                logger.info(f"Created JIRA issue: {issue.key}")
+
+            logger.info("JIRA issues created successfully")
+
+        except ImportError:
+            logger.warning("JIRA integration skipped - package not installed")
+        except Exception as e:
+            logger.error(f"Failed to create JIRA issues: {str(e)}",
+                            extra={"error": str(e), "stack_trace": traceback.format_exc()})
+            raise
+
+    async def _create_servicenow_tickets(self, findings: List[Dict[str, Any]]) -> None:
+        """Create ServiceNow tickets for findings."""
+        logger = self._get_logger()
+        try:
+            snow_config = self.config['notifications']['servicenow']
+            if not snow_config['enabled']:
+                logger.info("ServiceNow integration is disabled")
+                return
+
+            # Import pysnow only when needed
+            try:
+                import pysnow
+            except ImportError:
+                logger.warning("pysnow package not installed. Install with: pip install pysnow")
+                return
+
+            client = pysnow.Client(
+                instance=snow_config['instance_url'],
+                user=snow_config['username'],
+                password=snow_config['password']
+            )
+
+            incident = client.resource(api_path=f"/table/{snow_config['table']}")
+            
+            for finding in findings:
+                ticket_data = NotificationTemplate.generate_servicenow_ticket(finding, snow_config)
+                result = incident.create(payload=ticket_data)
+                logger.info(f"Created ServiceNow ticket: {result['number']}")
+
+            logger.info("ServiceNow tickets created successfully")
+
+        except ImportError:
+            logger.warning("ServiceNow integration skipped - package not installed")
+        except Exception as e:
+            logger.error(f"Failed to create ServiceNow tickets: {str(e)}",
+                            extra={"error": str(e), "stack_trace": traceback.format_exc()})
+            raise
+
     async def send_notifications(self, report: Dict[str, Any]) -> None:
         """Send notifications through configured channels."""
         logger = self._get_logger()
@@ -228,6 +361,12 @@ class Notifier:
                 
             if self.config['notifications']['slack']['enabled']:
                 tasks.append(self._send_slack(slack_message))
+
+            if self.config['notifications']['jira']['enabled']:
+                tasks.append(self._create_jira_issues(report['detailed_findings']))
+
+            if self.config['notifications']['servicenow']['enabled']:
+                tasks.append(self._create_servicenow_tickets(report['detailed_findings']))
                 
             if tasks:
                 await asyncio.gather(*tasks)

@@ -1,4 +1,3 @@
-import logging
 import asyncio
 import traceback
 import yaml
@@ -6,6 +5,7 @@ import os
 from typing import Any, Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from tqdm import tqdm
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -39,10 +39,9 @@ class Finding:
 class Scanner:
     def __init__(self, config_manager: Any, credentials: Any):
         """Initialize the scanner with configuration and credentials."""
-        print("Initializing Scanner...")
         self.config = config_manager
         self.credentials = credentials
-        self.logger = None  # Will be initialized when needed
+        self.logger = None
         
         # Get scanner configuration
         scanner_config = self.config['scanner']
@@ -54,22 +53,15 @@ class Scanner:
         self.benchmarks = self._load_cis_benchmarks(scanner_config['cis_benchmarks_file'])
         
         # Initialize clients
-        print("Getting project ID...")
         self.project_id = getattr(credentials, "project_id", None)
         if not self.project_id:
             raise ValueError("Project ID must be set in credentials")
         
-        print(f"Initializing storage client for project {self.project_id}...")
         self.storage_client = storage.Client(
             project=self.project_id,
             credentials=self.credentials
         )
-        print("Storage client initialized")
-
-        print("Initializing Resource Manager client...")
         self.resource_manager_client = resourcemanager_v3.ProjectsClient(credentials=self.credentials)
-        print("Resource Manager client initialized")
-        print("Scanner initialization complete")
 
     def _load_cis_benchmarks(self, benchmarks_file: str) -> Dict[str, Any]:
         """Load CIS benchmarks from YAML file."""
@@ -78,8 +70,7 @@ class Scanner:
             with open(file_path, 'r') as f:
                 return yaml.safe_load(f)
         except Exception as e:
-            print(f"Error loading CIS benchmarks: {str(e)}")
-            raise
+            raise RuntimeError(f"Error loading CIS benchmarks: {str(e)}")
 
     def _get_logger(self):
         """Get or initialize logger."""
@@ -92,21 +83,19 @@ class Scanner:
         wait=wait_exponential(multiplier=1, min=4, max=10),
         retry=retry_if_exception_type(google_exceptions.RetryError)
     )
-    async def _scan_storage_bucket(self, bucket: storage.Bucket) -> Optional[Finding]:
+    async def _scan_storage_bucket(self, bucket: storage.Bucket, pbar: tqdm) -> Optional[Finding]:
         """Scan a single storage bucket with retry mechanism."""
         try:
             logger = self._get_logger()
-            logger.info(f"Scanning bucket: {bucket.name}")
-            print(f"Scanning bucket: {bucket.name}")
             
             # Check bucket IAM configuration
             if bucket.iam_configuration.uniform_bucket_level_access_enabled:
-                logger.info(f"Bucket {bucket.name} has uniform access enabled")
+                pbar.update(1)
                 return None
                 
             if bucket.iam_configuration.public_access_prevention != "enforced":
-                logger.warning(f"Bucket {bucket.name} is publicly accessible")
                 benchmark = self.benchmarks['cis_benchmarks'][0]  # 5.1 benchmark
+                pbar.update(1)
                 return Finding(
                     description=f"Bucket {bucket.name} is publicly accessible",
                     cis_id=benchmark['id'],
@@ -127,17 +116,12 @@ class Scanner:
                     references=benchmark['references']
                 )
             
-            logger.info(f"Bucket {bucket.name} has public access prevention enforced")
+            pbar.update(1)
             return None
             
         except Exception as e:
-            logger = self._get_logger()
-            logger.error(
-                f"Error scanning bucket {bucket.name}",
-                extra={"error": str(e), "stack_trace": traceback.format_exc()}
-            )
-            print(f"Error scanning bucket {bucket.name}: {str(e)}")
-            traceback.print_exc()
+            logger.error(f"Error scanning bucket {bucket.name}", extra={"error": str(e)})
+            pbar.update(1)
             raise
 
     @retry(
@@ -145,20 +129,19 @@ class Scanner:
         wait=wait_exponential(multiplier=1, min=4, max=10),
         retry=retry_if_exception_type(google_exceptions.RetryError)
     )
-    async def _scan_iam_binding(self, binding: Dict[str, Any]) -> Optional[Finding]:
+    async def _scan_iam_binding(self, binding: Dict[str, Any], pbar: tqdm) -> Optional[Finding]:
         """Scan a single IAM binding with retry mechanism."""
         try:
             logger = self._get_logger()
             role = binding.get('role', '')
             members = binding.get('members', [])
-            print(f"Scanning IAM binding: {role}")
             
             # Check for public access
             public_members = [m for m in members if m in ["allUsers", "allAuthenticatedUsers"]]
             if public_members:
-                logger.warning(f"IAM role {role} allows public access")
                 benchmark = next((b for b in self.benchmarks['cis_benchmarks'] if b['id'] == '1.4'), None)
                 if benchmark:
+                    pbar.update(1)
                     return Finding(
                         description=f"IAM role {role} allows public access",
                         cis_id=benchmark['id'],
@@ -180,53 +163,42 @@ class Scanner:
                         references=benchmark['references']
                     )
             
-            logger.info(f"IAM role {role} does not allow public access")
+            pbar.update(1)
             return None
             
         except Exception as e:
-            logger = self._get_logger()
-            logger.error(
-                f"Error scanning IAM binding {binding.get('role', 'unknown')}",
-                extra={"error": str(e), "stack_trace": traceback.format_exc()}
-            )
-            print(f"Error scanning IAM binding {binding.get('role', 'unknown')}: {str(e)}")
-            traceback.print_exc()
+            logger.error(f"Error scanning IAM binding {binding.get('role', 'unknown')}", extra={"error": str(e)})
+            pbar.update(1)
             raise
 
     async def _scan_storage(self) -> List[Finding]:
         """Scan all storage buckets with pagination."""
         findings = []
         try:
-            print("Starting storage scan...")
             logger = self._get_logger()
             page_token = None
             while True:
-                print("Listing storage buckets...")
                 buckets_iterator = self.storage_client.list_buckets(
                     max_results=self.batch_size,
                     page_token=page_token
                 )
                 
                 current_batch = list(buckets_iterator)
-                print(f"Found {len(current_batch)} buckets")
-                logger.info(f"Scanning batch of {len(current_batch)} storage buckets")
                 
-                # Process current batch
+                # Process current batch with progress bar
                 tasks = []
-                for bucket in current_batch:
-                    task = asyncio.create_task(self._scan_storage_bucket(bucket))
-                    tasks.append(task)
-                
-                # Wait for all tasks in the current batch
-                print("Waiting for bucket scan tasks to complete...")
-                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                with tqdm(total=len(current_batch), desc="🔍 Storage Buckets", unit="bucket") as pbar:
+                    for bucket in current_batch:
+                        task = asyncio.create_task(self._scan_storage_bucket(bucket, pbar))
+                        tasks.append(task)
+                    
+                    # Wait for all tasks in the current batch
+                    batch_results = await asyncio.gather(*tasks, return_exceptions=True)
                 
                 # Process results
                 for result in batch_results:
                     if isinstance(result, Exception):
-                        logger.error("Error in storage scanning batch",
-                                        extra={"error": str(result)})
-                        print(f"Error in batch: {str(result)}")
+                        logger.error("Error in storage scanning batch", extra={"error": str(result)})
                     elif result is not None:
                         findings.append(result)
                 
@@ -236,64 +208,46 @@ class Scanner:
                 page_token = buckets_iterator.next_page_token
                 
         except Exception as e:
-            logger = self._get_logger()
-            logger.error("Error in storage scanning",
-                            extra={"error": str(e), "stack_trace": traceback.format_exc()})
-            print(f"Error in storage scanning: {str(e)}")
-            traceback.print_exc()
+            logger.error("Error in storage scanning", extra={"error": str(e)})
         
-        print(f"Storage scan complete. Found {len(findings)} findings.")
         return findings
 
     async def _scan_iam(self) -> List[Finding]:
         """Scan all IAM bindings with pagination."""
         findings = []
         try:
-            print("Starting IAM scan...")
             logger = self._get_logger()
             project_name = f"projects/{self.project_id}"
             
             # Get IAM policy
-            print("Getting IAM policy...")
             request = iam_policy_pb2.GetIamPolicyRequest(resource=project_name)
             policy = self.resource_manager_client.get_iam_policy(request=request)
             bindings = [{"role": b.role, "members": list(b.members)} for b in policy.bindings]
-            print(f"Found {len(bindings)} IAM bindings")
-            logger.info(f"Scanning {len(bindings)} IAM bindings")
             
             # Process bindings in batches
             for i in range(0, len(bindings), self.batch_size):
                 batch = bindings[i:i + self.batch_size]
-                print(f"Processing batch of {len(batch)} IAM bindings")
-                logger.info(f"Scanning batch of {len(batch)} IAM bindings")
                 
-                # Create tasks for current batch
+                # Create tasks for current batch with progress bar
                 tasks = []
-                for binding in batch:
-                    task = asyncio.create_task(self._scan_iam_binding(binding))
-                    tasks.append(task)
-                
-                # Wait for all tasks in the current batch
-                print("Waiting for IAM binding scan tasks to complete...")
-                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                with tqdm(total=len(batch), desc="🔍 IAM Bindings", unit="binding") as pbar:
+                    for binding in batch:
+                        task = asyncio.create_task(self._scan_iam_binding(binding, pbar))
+                        tasks.append(task)
+                    
+                    # Wait for all tasks in the current batch
+                    batch_results = await asyncio.gather(*tasks, return_exceptions=True)
                 
                 # Process results
                 for result in batch_results:
                     if isinstance(result, Exception):
-                        logger.error("Error in IAM scanning batch",
-                                        extra={"error": str(result)})
-                        print(f"Error in batch: {str(result)}")
+                        logger.error("Error in IAM scanning batch", extra={"error": str(result)})
                     elif result is not None:
                         findings.append(result)
                 
         except Exception as e:
-            logger = self._get_logger()
-            logger.error("Error in IAM scanning",
-                            extra={"error": str(e), "stack_trace": traceback.format_exc()})
-            print(f"Error in IAM scanning: {str(e)}")
-            traceback.print_exc()
+            logger.error("Error in IAM scanning", extra={"error": str(e)})
         
-        print(f"IAM scan complete. Found {len(findings)} findings.")
         return findings
 
     @retry(
@@ -306,7 +260,6 @@ class Scanner:
         findings = []
         try:
             logger = self._get_logger()
-            print("Starting compute scan...")
 
             # Use gcloud command to list instances with public IPs
             import subprocess
@@ -322,103 +275,81 @@ class Scanner:
                 result = subprocess.run(cmd, capture_output=True, text=True, check=True)
                 instances = json.loads(result.stdout)
 
-                for instance in instances:
-                    # Skip GKE nodes as per benchmark exception
-                    if instance['name'].startswith('gke-') or 'labels' in instance and instance['labels'].get('goog-gke-node'):
-                        continue
+                with tqdm(total=len(instances), desc="🔍 Compute Instances", unit="instance") as pbar:
+                    for instance in instances:
+                        # Skip GKE nodes as per benchmark exception
+                        if instance['name'].startswith('gke-') or 'labels' in instance and instance['labels'].get('goog-gke-node'):
+                            pbar.update(1)
+                            continue
 
-                    for interface in instance.get('networkInterfaces', []):
-                        if 'accessConfigs' in interface:
-                            # Get the Level 2 version of 4.9 benchmark
-                            benchmark = next((b for b in self.benchmarks['cis_benchmarks'] 
-                                           if b['id'] == '4.9' and b['profile_applicability'] == 'Level 2'), None)
-                            if benchmark:
-                                findings.append(Finding(
-                                    description=f"Instance {instance['name']} has public IP address",
-                                    cis_id=benchmark['id'],
-                                    risk_level="High",
-                                    status="Non-Compliant",
-                                    resource_id=instance['name'],
-                                    resource_type="compute_instance",
-                                    title=benchmark['title'],
-                                    profile_applicability=benchmark['profile_applicability'],
-                                    rationale=benchmark['rationale'],
-                                    audit_command=benchmark['audit']['gcloud_command'],
-                                    remediation_steps=benchmark['remediation']['steps'],
-                                    prevention_steps=benchmark['prevention']['steps'],
-                                    references=benchmark['references']
-                                ))
-                            break  # Found a public IP, no need to check other interfaces
+                        for interface in instance.get('networkInterfaces', []):
+                            if 'accessConfigs' in interface:
+                                # Get the Level 1 version of 4.9 benchmark
+                                benchmark = next((b for b in self.benchmarks['cis_benchmarks'] 
+                                               if b['id'] == '4.9' and b['profile_applicability'] == 'Level 1'), None)
+                                if benchmark:
+                                    findings.append(Finding(
+                                        description=f"Instance {instance['name']} has public IP address",
+                                        cis_id=benchmark['id'],
+                                        risk_level="High",
+                                        status="Non-Compliant",
+                                        resource_id=instance['name'],
+                                        resource_type="compute_instance",
+                                        title=benchmark['title'],
+                                        profile_applicability=benchmark['profile_applicability'],
+                                        rationale=benchmark['rationale'],
+                                        audit_command=benchmark['audit']['gcloud_command'],
+                                        remediation_steps=benchmark['remediation']['steps'],
+                                        prevention_steps=benchmark['prevention']['steps'],
+                                        references=benchmark['references']
+                                    ))
+                                break  # Found a public IP, no need to check other interfaces
+                        pbar.update(1)
 
             except subprocess.CalledProcessError as e:
                 logger.error(f"Error running gcloud command: {e.stderr}")
-                print(f"Error running gcloud command: {e.stderr}")
                 raise
             except json.JSONDecodeError as e:
                 logger.error(f"Error parsing gcloud output: {e}")
-                print(f"Error parsing gcloud output: {e}")
                 raise
 
         except Exception as e:
-            logger = self._get_logger()
-            logger.error("Error in compute scanning",
-                        extra={"error": str(e), "stack_trace": traceback.format_exc()})
-            print(f"Error in compute scanning: {str(e)}")
-            traceback.print_exc()
+            logger.error("Error in compute scanning", extra={"error": str(e)})
             raise
 
-        print(f"Compute scan complete. Found {len(findings)} findings.")
         return findings
 
     async def scan(self) -> List[Finding]:
         """Perform parallel scanning of all resources."""
         all_findings = []
         try:
-            print("Starting security scan...")
             logger = self._get_logger()
+            print("\n=== Security Scan ===")
+            
             # Run storage, IAM, and compute scans concurrently
-            print("Starting concurrent scans...")
             storage_task = asyncio.create_task(self._scan_storage())
             iam_task = asyncio.create_task(self._scan_iam())
             compute_task = asyncio.create_task(self._scan_compute())
             
             # Wait for all scans to complete
-            print("Waiting for scans to complete...")
             storage_findings, iam_findings, compute_findings = await asyncio.gather(
                 storage_task, iam_task, compute_task, return_exceptions=True
             )
             
-            # Process storage findings
-            if isinstance(storage_findings, Exception):
-                logger.error("Error in storage scanning",
-                                extra={"error": str(storage_findings)})
-                print(f"Error in storage scanning: {str(storage_findings)}")
-            else:
-                all_findings.extend(storage_findings)
-            
-            # Process IAM findings
-            if isinstance(iam_findings, Exception):
-                logger.error("Error in IAM scanning",
-                                extra={"error": str(iam_findings)})
-                print(f"Error in IAM scanning: {str(iam_findings)}")
-            else:
-                all_findings.extend(iam_findings)
-
-            # Process compute findings
-            if isinstance(compute_findings, Exception):
-                logger.error("Error in compute scanning",
-                                extra={"error": str(compute_findings)})
-                print(f"Error in compute scanning: {str(compute_findings)}")
-            else:
-                all_findings.extend(compute_findings)
+            # Process findings
+            for findings, scan_type in [
+                (storage_findings, "Storage"),
+                (iam_findings, "IAM"),
+                (compute_findings, "Compute")
+            ]:
+                if isinstance(findings, Exception):
+                    logger.error(f"Error in {scan_type} scanning", extra={"error": str(findings)})
+                else:
+                    all_findings.extend(findings)
             
         except Exception as e:
-            logger = self._get_logger()
-            logger.error("Error in scanning task",
-                            extra={"error": str(e), "stack_trace": traceback.format_exc()})
-            print(f"Error in scanning task: {str(e)}")
-            traceback.print_exc()
+            logger.error("Error in scanning task", extra={"error": str(e)})
             raise
         
-        print(f"Scan complete. Total findings: {len(all_findings)}")
+        print(f"\n🔍 Found {len(all_findings)} security issues\n")
         return all_findings

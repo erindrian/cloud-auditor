@@ -1,5 +1,6 @@
 import os
 import yaml
+import json
 from typing import Any, Dict, Optional
 
 class ConfigManager:
@@ -7,12 +8,34 @@ class ConfigManager:
     
     def __init__(self, config_path: str):
         """Initialize with configuration file path."""
-        print(f"Loading config from: {config_path}")
+        print("\n=== Loading Configuration ===")
+        print(f"📂 Config path: {config_path}")
         self.config_path = config_path
         self.config = self._load_config()
-        print(f"Loaded config: {self.config}")
+        self._process_env_vars()  # Process env vars before validation
+        self._print_config()
         self._validate_config()
-        self._process_env_vars()
+
+    def _print_config(self) -> None:
+        """Print configuration in a formatted way."""
+        print("\n=== Cloud Auditor ===")
+        print(f"🔐 Project: {self.config['gcp']['project_id']}")
+        
+        # Print enabled notifications
+        notifications = []
+        if self.config['notifications']['smtp']['enabled']:
+            notifications.append("📧 Email")
+        if self.config['notifications']['slack']['enabled']:
+            notifications.append("💬 Slack")
+        if self.config.get('notifications', {}).get('jira', {}).get('enabled'):
+            notifications.append("🎫 JIRA")
+        if self.config.get('notifications', {}).get('servicenow', {}).get('enabled'):
+            notifications.append("🔧 ServiceNow")
+        
+        if notifications:
+            print(f"📢 Notifications: {' '.join(notifications)}")
+        
+        print("===================\n")
 
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from YAML file."""
@@ -76,19 +99,33 @@ class ConfigManager:
     def _process_env_vars(self) -> None:
         """Process environment variables in configuration."""
         def process_value(value: Any) -> Any:
-            if isinstance(value, str) and value.startswith('${') and value.endswith('}'):
-                env_var = value[2:-1]
-                if ':' in env_var:
-                    env_var, default = env_var.split(':', 1)
-                    return os.getenv(env_var, default)
-                return os.getenv(env_var)
+            if isinstance(value, str):
+                # Handle ${VAR} format
+                if value.startswith('${') and value.endswith('}'):
+                    env_var = value[2:-1]
+                    if ':' in env_var:
+                        env_var, default = env_var.split(':', 1)
+                        return os.getenv(env_var) or default
+                    return os.getenv(env_var, value)  # Return original value if env var not found
+                # Handle direct environment variable names
+                elif value in os.environ:
+                    return os.environ[value]
             elif isinstance(value, dict):
                 return {k: process_value(v) for k, v in value.items()}
             elif isinstance(value, list):
                 return [process_value(item) for item in value]
             return value
 
+        # Process environment variables
         self.config = process_value(self.config)
+
+        # Special handling for GCP service account key path
+        if 'gcp' in self.config and 'service_account_key_path' in self.config['gcp']:
+            key_path = os.getenv('GCP_SERVICE_ACCOUNT_KEY_PATH', self.config['gcp']['service_account_key_path'])
+            if not os.path.isabs(key_path):
+                base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                key_path = os.path.join(base_dir, key_path)
+            self.config['gcp']['service_account_key_path'] = key_path
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get configuration value by key."""

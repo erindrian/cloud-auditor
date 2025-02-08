@@ -170,8 +170,8 @@ cis_benchmarks:
       - "https://cloud.google.com/vpc/docs/firewalls"
 
   - id: "4.9"
-    title: "Ensure That Compute Instances Do Not Have Public IP Addresses (Automated)"
-    profile_applicability: "Level 2"
+    title: "Ensure That Compute Instances Do Not Have Public IP Addresses"
+    profile_applicability: "Level 1"
     description: "Compute instances should not be configured to have external IP addresses."
     rationale: "To reduce your attack surface, Compute instances should not have public IP addresses. Instead, instances should be configured behind load balancers to minimize their exposure to the internet."
     impact: "Removing the external IP address from your Compute instance may cause some applications to stop working."

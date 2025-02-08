@@ -23,20 +23,63 @@ A Python-based tool for auditing cloud security configurations in GCP environmen
 - **Notifications**
   - Email notifications with HTML formatting
   - Slack notifications for critical findings
+  - JIRA integration with customizable fields and priorities
+  - ServiceNow integration with configurable tables and categories
+  - Automatic ticket creation for security findings
+  - Risk-based priority mapping
   - Rate-limited notification delivery
   - Customizable message templates
 
 ## Prerequisites
 
-- Python 3.x
-- GCP Service Account with appropriate permissions
-- Enabled GCP APIs:
-  - Cloud Storage API
-  - Cloud Resource Manager API
-  - Compute Engine API
-- Authenticated gcloud CLI (`gcloud auth login`)
+1. Python 3.x
+
+2. GCP Project Setup:
+   1. Create a new project or select an existing one in [Google Cloud Console](https://console.cloud.google.com)
+   2. Enable required APIs:
+      ```bash
+      # Enable Cloud Storage API
+      gcloud services enable storage.googleapis.com
+      
+      # Enable Cloud Resource Manager API
+      gcloud services enable cloudresourcemanager.googleapis.com
+      
+      # Enable Compute Engine API
+      gcloud services enable compute.googleapis.com
+      ```
+
+3. GCP Service Account:
+   1. Create a service account in GCP Console
+   2. Grant required permissions:
+      - Storage Admin (for bucket scanning)
+      - Security Reviewer (for IAM scanning)
+      - Compute Viewer (for instance scanning)
+   3. Download the service account key JSON file
+   4. Place the key file in the `credentials` directory
+   5. Update GCP_SERVICE_ACCOUNT_KEY_PATH in .env to point to your key file
+
+4. gcloud CLI Authentication:
+   ```bash
+   # Login with your account
+   gcloud auth login
+   
+   # Set the project
+   gcloud config set project YOUR_PROJECT_ID
+   
+   # Verify authentication
+   gcloud auth list
+   ```
+
+Optional integrations:
 - SMTP server (for email notifications)
 - Slack webhook URL (for Slack notifications)
+- JIRA access (for issue creation)
+- ServiceNow access (for ticket creation)
+
+Note: The ticketing system integrations (JIRA and ServiceNow) require additional Python packages. Install them with:
+```bash
+pip install jira pysnow  # Optional: only needed if using JIRA or ServiceNow
+```
 
 ## Installation
 
@@ -90,6 +133,35 @@ notifications:
     webhook_url: ${SLACK_WEBHOOK_URL}
     channel: ${SLACK_CHANNEL}
 
+  jira:
+    enabled: ${JIRA_ENABLED:-false}
+    url: ${JIRA_URL}
+    username: ${JIRA_USERNAME}
+    api_token: ${JIRA_API_TOKEN}
+    project_key: ${JIRA_PROJECT_KEY}
+    issue_type: ${JIRA_ISSUE_TYPE:-Task}
+    labels: ${JIRA_LABELS:-security,compliance}
+    priority_field: ${JIRA_PRIORITY_FIELD:-priority}
+    priority_mapping:
+      Critical: Highest
+      High: High
+      Medium: Medium
+      Low: Low
+
+  servicenow:
+    enabled: ${SERVICENOW_ENABLED:-false}
+    instance_url: ${SERVICENOW_INSTANCE_URL}
+    username: ${SERVICENOW_USERNAME}
+    password: ${SERVICENOW_PASSWORD}
+    table: ${SERVICENOW_TABLE:-incident}
+    assignment_group: ${SERVICENOW_ASSIGNMENT_GROUP:-Security}
+    category: ${SERVICENOW_CATEGORY:-Security}
+    urgency_mapping:
+      Critical: 1
+      High: 2
+      Medium: 3
+      Low: 4
+
 scanner:
   max_workers: ${SCANNER_MAX_WORKERS:-3}
   timeout: ${SCANNER_TIMEOUT:-30}
@@ -101,13 +173,34 @@ scanner:
 
 Required environment variables:
 - `GCP_SERVICE_ACCOUNT_KEY_PATH`: Path to GCP service account key file
-- `SMTP_SENDER_EMAIL`: Sender email address (if SMTP enabled)
-- `SMTP_RECEIVER_EMAIL`: Receiver email address (if SMTP enabled)
-- `SMTP_SERVER`: SMTP server hostname (if SMTP enabled)
-- `SMTP_USERNAME`: SMTP username (if SMTP enabled)
-- `SMTP_PASSWORD`: SMTP password (if SMTP enabled)
-- `SLACK_WEBHOOK_URL`: Slack webhook URL (if Slack enabled)
-- `SLACK_CHANNEL`: Slack channel name (if Slack enabled)
+
+Email notifications (if enabled):
+- `SMTP_SENDER_EMAIL`: Sender email address
+- `SMTP_RECEIVER_EMAIL`: Receiver email address
+- `SMTP_SERVER`: SMTP server hostname
+- `SMTP_USERNAME`: SMTP username
+- `SMTP_PASSWORD`: SMTP password
+
+Slack notifications (if enabled):
+- `SLACK_WEBHOOK_URL`: Slack webhook URL
+- `SLACK_CHANNEL`: Slack channel name
+
+JIRA integration (if enabled):
+- `JIRA_URL`: JIRA instance URL
+- `JIRA_USERNAME`: JIRA username
+- `JIRA_API_TOKEN`: JIRA API token
+- `JIRA_PROJECT_KEY`: Project key for issue creation
+- `JIRA_ISSUE_TYPE`: Issue type (default: Task)
+- `JIRA_LABELS`: Comma-separated list of labels
+- `JIRA_PRIORITY_FIELD`: Field name for priority (default: priority)
+
+ServiceNow integration (if enabled):
+- `SERVICENOW_INSTANCE_URL`: ServiceNow instance URL
+- `SERVICENOW_USERNAME`: ServiceNow username
+- `SERVICENOW_PASSWORD`: ServiceNow password
+- `SERVICENOW_TABLE`: Table for ticket creation (default: incident)
+- `SERVICENOW_ASSIGNMENT_GROUP`: Assignment group (default: Security)
+- `SERVICENOW_CATEGORY`: Ticket category (default: Security)
 
 Optional environment variables with defaults:
 - `LOG_LEVEL`: Logging level (default: INFO)

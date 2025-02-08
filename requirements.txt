@@ -6,3 +6,7 @@ google-auth>=2.22.0
 pyyaml>=6.0.1
 tenacity>=8.2.3
 aiohttp>=3.8.5
+jira>=3.5.1
+pysnow>=0.7.17
+python-dotenv>=1.0.0
+tqdm>=4.66.1

@@ -1,5 +1,5 @@
 gcp:
-  service_account_key_path: "credentials/test-project-450103-5848b7183463 18.33.58 18.47.19.json"
+  service_account_key_path: ${GCP_SERVICE_ACCOUNT_KEY_PATH}
   project_id: test-project-450103
 
 logging:
@@ -23,6 +23,35 @@ notifications:
     enabled: false
     webhook_url: ${SLACK_WEBHOOK_URL}
     channel: ${SLACK_CHANNEL}
+
+  jira:
+    enabled: ${JIRA_ENABLED:-false}
+    url: ${JIRA_URL}
+    username: ${JIRA_USERNAME}
+    api_token: ${JIRA_API_TOKEN}
+    project_key: ${JIRA_PROJECT_KEY}
+    issue_type: ${JIRA_ISSUE_TYPE:-Task}
+    labels: ${JIRA_LABELS:-security,compliance}
+    priority_field: ${JIRA_PRIORITY_FIELD:-priority}
+    priority_mapping:
+      Critical: Highest
+      High: High
+      Medium: Medium
+      Low: Low
+
+  servicenow:
+    enabled: ${SERVICENOW_ENABLED:-false}
+    instance_url: ${SERVICENOW_INSTANCE_URL}
+    username: ${SERVICENOW_USERNAME}
+    password: ${SERVICENOW_PASSWORD}
+    table: ${SERVICENOW_TABLE:-incident}
+    assignment_group: ${SERVICENOW_ASSIGNMENT_GROUP:-Security}
+    category: ${SERVICENOW_CATEGORY:-Security}
+    urgency_mapping:
+      Critical: 1
+      High: 2
+      Medium: 3
+      Low: 4
 
 scanner:
   max_workers: 3

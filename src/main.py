@@ -4,6 +4,8 @@ import sys
 import asyncio
 import traceback
 from typing import Any, Dict, Optional
+from pathlib import Path
+from dotenv import load_dotenv
 from src.utils.logger import Logger
 from src.modules.scanner import Scanner
 from src.modules.reporter import Reporter
@@ -87,6 +89,11 @@ def main():
     print("Starting main function...")
     
     try:
+        # Load environment variables from .env file
+        env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+        if os.path.exists(env_path):
+            load_dotenv(env_path)
+            print("Loaded environment variables from .env")
         # Get config path
         config_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
