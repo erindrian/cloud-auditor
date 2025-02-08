@@ -1,9 +1,11 @@
 import logging
 import asyncio
 import traceback
+import yaml
+import os
 from typing import Any, Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -26,6 +28,13 @@ class Finding:
     resource_id: str
     resource_type: str
     details: Optional[Dict[str, Any]] = None
+    title: str = ""
+    profile_applicability: str = ""
+    rationale: str = ""
+    audit_command: str = ""
+    remediation_steps: List[str] = field(default_factory=list)
+    prevention_steps: List[str] = field(default_factory=list)
+    references: List[str] = field(default_factory=list)
 
 class Scanner:
     def __init__(self, config_manager: Any, credentials: Any):
@@ -40,6 +49,9 @@ class Scanner:
         self.max_workers = scanner_config['max_workers']
         self.timeout = scanner_config['timeout']
         self.batch_size = scanner_config['batch_size']
+        
+        # Load CIS benchmarks
+        self.benchmarks = self._load_cis_benchmarks(scanner_config['cis_benchmarks_file'])
         
         # Initialize clients
         print("Getting project ID...")
@@ -58,6 +70,16 @@ class Scanner:
         self.resource_manager_client = resourcemanager_v3.ProjectsClient(credentials=self.credentials)
         print("Resource Manager client initialized")
         print("Scanner initialization complete")
+
+    def _load_cis_benchmarks(self, benchmarks_file: str) -> Dict[str, Any]:
+        """Load CIS benchmarks from YAML file."""
+        try:
+            file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), benchmarks_file)
+            with open(file_path, 'r') as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            print(f"Error loading CIS benchmarks: {str(e)}")
+            raise
 
     def _get_logger(self):
         """Get or initialize logger."""
@@ -84,9 +106,10 @@ class Scanner:
                 
             if bucket.iam_configuration.public_access_prevention != "enforced":
                 logger.warning(f"Bucket {bucket.name} is publicly accessible")
+                benchmark = self.benchmarks['cis_benchmarks'][0]  # 5.1 benchmark
                 return Finding(
                     description=f"Bucket {bucket.name} is publicly accessible",
-                    cis_id="5.1",
+                    cis_id=benchmark['id'],
                     risk_level="High",
                     status="Non-Compliant",
                     resource_id=bucket.name,
@@ -94,7 +117,14 @@ class Scanner:
                     details={
                         "public_access_prevention": bucket.iam_configuration.public_access_prevention,
                         "uniform_bucket_level_access": bucket.iam_configuration.uniform_bucket_level_access_enabled
-                    }
+                    },
+                    title=benchmark['title'],
+                    profile_applicability=benchmark['profile_applicability'],
+                    rationale=benchmark['rationale'],
+                    audit_command=benchmark['audit']['gcloud_command'],
+                    remediation_steps=benchmark['remediation']['steps'],
+                    prevention_steps=benchmark['prevention']['steps'],
+                    references=benchmark['references']
                 )
             
             logger.info(f"Bucket {bucket.name} has public access prevention enforced")
@@ -127,19 +157,28 @@ class Scanner:
             public_members = [m for m in members if m in ["allUsers", "allAuthenticatedUsers"]]
             if public_members:
                 logger.warning(f"IAM role {role} allows public access")
-                return Finding(
-                    description=f"IAM role {role} allows public access",
-                    cis_id="1.4",
-                    risk_level="High",
-                    status="Non-Compliant",
-                    resource_id=role,
-                    resource_type="iam_role",
-                    details={
-                        "members": list(members),
-                        "role": role,
-                        "public_members": public_members
-                    }
-                )
+                benchmark = next((b for b in self.benchmarks['cis_benchmarks'] if b['id'] == '1.4'), None)
+                if benchmark:
+                    return Finding(
+                        description=f"IAM role {role} allows public access",
+                        cis_id=benchmark['id'],
+                        risk_level="High",
+                        status="Non-Compliant",
+                        resource_id=role,
+                        resource_type="iam_role",
+                        details={
+                            "members": list(members),
+                            "role": role,
+                            "public_members": public_members
+                        },
+                        title=benchmark['title'],
+                        profile_applicability=benchmark['profile_applicability'],
+                        rationale=benchmark['rationale'],
+                        audit_command=benchmark['audit']['gcloud_command'],
+                        remediation_steps=benchmark['remediation']['steps'],
+                        prevention_steps=benchmark['prevention']['steps'],
+                        references=benchmark['references']
+                    )
             
             logger.info(f"IAM role {role} does not allow public access")
             return None

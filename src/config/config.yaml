@@ -28,6 +28,7 @@ scanner:
   max_workers: 3
   timeout: 30
   batch_size: 100
+  cis_benchmarks_file: config/cis_benchmarks.yaml
 
 reporter:
   output_dir: reports

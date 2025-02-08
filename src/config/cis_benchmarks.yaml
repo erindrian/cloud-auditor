@@ -1,0 +1,104 @@
+cis_benchmarks:
+  # Public Bucket Scanning
+  - id: "5.1"
+    title: "Ensure That Cloud Storage Bucket Is Not Anonymously or Publicly Accessible (Automated)"
+    profile_applicability: "Level 1"
+    description: "It is recommended that IAM policy on Cloud Storage bucket does not allow anonymous or public access."
+    rationale: "Allowing anonymous or public access grants permissions to anyone to access bucket content. Such access might not be desired if you are storing any sensitive data."
+    audit:
+      gcloud_command: "gsutil iam get gs://BUCKET_NAME"
+    remediation:
+      steps:
+        - "Remove allUsers and allAuthenticatedUsers from the IAM policy of the bucket."
+        - "Use the following commands to remove public access:"
+        - "gsutil iam ch -d allUsers gs://BUCKET_NAME"
+        - "gsutil iam ch -d allAuthenticatedUsers gs://BUCKET_NAME"
+    prevention:
+      steps:
+        - "Prevent buckets from becoming publicly accessible by setting up the Domain restricted sharing organization policy."
+    default_value: "By default, storage buckets are not publicly shared."
+    references:
+      - "https://cloud.google.com/storage/docs/access-control/iam-reference"
+      - "https://cloud.google.com/storage/docs/access-control/making-data-public"
+      - "https://cloud.google.com/storage/docs/gsutil/commands/iam"
+
+  - id: "5.2"
+    title: "Ensure That Cloud Storage Buckets Have Uniform Bucket-Level Access Enabled (Automated)"
+    profile_applicability: "Level 2"
+    description: "It is recommended that uniform bucket-level access is enabled on Cloud Storage buckets."
+    rationale: "Uniform bucket-level access simplifies permission management by granting access exclusively through Cloud IAM, disabling ACLs."
+    audit:
+      gcloud_command: "gsutil uniformbucketlevelaccess get gs://BUCKET_NAME/"
+    remediation:
+      steps:
+        - "Enable uniform bucket-level access using the following command:"
+        - "gsutil uniformbucketlevelaccess set on gs://BUCKET_NAME/"
+    prevention:
+      steps:
+        - "Set up an Organization Policy to enforce uniform bucket-level access for new buckets."
+    default_value: "By default, Cloud Storage buckets do not have uniform bucket-level access enabled."
+    references:
+      - "https://cloud.google.com/storage/docs/uniform-bucket-level-access"
+      - "https://cloud.google.com/storage/docs/using-uniform-bucket-level-access"
+      - "https://cloud.google.com/storage/docs/setting-org-policies#uniform-bucket"
+
+  # Over-Permissive IAM Account Scanning
+  - id: "1.4"
+    title: "Ensure That There Are Only GCP-Managed Service Account Keys for Each Service Account (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure only GCP-managed service account keys exist."
+    rationale: "GCP-managed keys reduce the risk of key compromise compared to user-managed keys."
+    audit:
+      gcloud_command: "gcloud iam service-accounts keys list --iam-account=SERVICE_ACCOUNT_EMAIL --managed-by=user"
+    remediation:
+      steps:
+        - "Delete any user-managed keys for service accounts using the following command:"
+        - "gcloud iam service-accounts keys delete --iam-account=<user-managed-service-account-EMAIL> <KEY-ID>"
+    prevention:
+      steps:
+        - "Disable service account key creation through the Disable service account key creation Organization policy."
+    default_value: "By default, there are no user-managed keys created for user-managed service accounts."
+    references:
+      - "https://cloud.google.com/iam/docs/understanding-service-accounts#managing_service_account_keys"
+
+  - id: "1.5"
+    title: "Ensure That Service Account Has No Admin Privileges (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure service accounts do not have admin privileges."
+    rationale: "Service accounts with admin privileges can lead to privilege escalation and unauthorized access."
+    audit:
+      gcloud_command: "gcloud projects get-iam-policy PROJECT_ID --format=json | jq '.bindings[] | select(.role | contains(\"roles/editor\") or contains(\"roles/owner\") or contains(\"roles/admin\"))'"
+    remediation:
+      steps:
+        - "Remove admin roles from service accounts in the IAM policy."
+    default_value: "By default, service accounts do not have admin privileges unless explicitly granted."
+    references:
+      - "https://cloud.google.com/iam/docs/understanding-roles"
+
+  - id: "1.6"
+    title: "Ensure That IAM Users Are Not Assigned the Service Account User or Service Account Token Creator Roles at Project Level (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure IAM users are not assigned the Service Account User or Service Account Token Creator roles at the project level."
+    rationale: "Assigning these roles at the project level grants access to all service accounts, increasing the risk of misuse."
+    audit:
+      gcloud_command: "gcloud projects get-iam-policy PROJECT_ID --format=json | jq '.bindings[] | select(.role == \"roles/iam.serviceAccountUser\" or .role == \"roles/iam.serviceAccountTokenCreator\")'"
+    remediation:
+      steps:
+        - "Revoke the Service Account User or Service Account Token Creator roles at the project level and assign them to specific service accounts instead."
+    default_value: "By default, these roles are not assigned at the project level."
+    references:
+      - "https://cloud.google.com/iam/docs/service-accounts"
+
+  - id: "1.8"
+    title: "Ensure That Separation of Duties Is Enforced While Assigning Service Account Related Roles to Users (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure separation of duties is enforced while assigning service account-related roles to users."
+    rationale: "Separation of duties prevents a single user from having both Service Account Admin and Service Account User roles, reducing the risk of privilege escalation."
+    audit:
+      gcloud_command: "gcloud projects get-iam-policy [Project_ID] --format json | jq -r '[([\"Service_Account_Admin_and_User\"] | (., map(length*\"-\"))), ([.bindings[] | select(.role == \"roles/iam.serviceAccountAdmin\" or .role == \"roles/iam.serviceAccountUser\").members[]] | group_by(.) | map({User: ., Count: length}) | [] | select(.Count == 2).User | unique)] | [] | @tsv'"
+    remediation:
+      steps:
+        - "Remove either the Service Account Admin or Service Account User role from users who have both roles assigned."
+    default_value: "By default, users do not have both roles assigned simultaneously."
+    references:
+      - "https://cloud.google.com/iam/docs/service-accounts"
