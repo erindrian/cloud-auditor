@@ -20,6 +20,30 @@ cis_benchmarks:
         - "Prevent buckets from becoming publicly accessible."
     references:
       - "https://cloud.google.com/storage/docs/access-control/iam-reference"
+  - id: "3.1"
+    title: "Ensure That the Default Network Does Not Exist in a Project"
+    profile_applicability: "Level 2"
+    description: "To prevent use of default network, a project should not have a default network."
+    rationale: "The default network has preconfigured insecure firewall rules."
+    audit:
+      gcloud_command: "gcloud compute networks list"
+    remediation:
+      steps:
+        - "Delete the default network if it exists."
+    references:
+      - "https://cloud.google.com/vpc/docs/using-firewalls"
+  - id: "4.9"
+    title: "Ensure That Compute Instances Do Not Have Public IP Addresses"
+    profile_applicability: "Level 1"
+    description: "Ensure that Compute Engine instances do not have public IP addresses."
+    rationale: "Public IP addresses expose instances directly to the internet."
+    audit:
+      gcloud_command: "gcloud compute instances list"
+    remediation:
+      steps:
+        - "Remove public IP addresses from instances."
+    references:
+      - "https://cloud.google.com/compute/docs/ip-addresses"
 """
 
 @pytest.fixture
@@ -91,3 +115,48 @@ async def test_scan_storage_bucket_uniform_access(mock_config, mock_credentials,
         scanner = Scanner(mock_config, mock_credentials)
         finding = await scanner._scan_storage_bucket(mock_bucket)
         assert finding is None
+
+@pytest.fixture
+def mock_network():
+    network = Mock()
+    network.name = "default"
+    return network
+
+@pytest.fixture
+def mock_instance():
+    instance = Mock()
+    instance.name = "test-instance"
+    interface = Mock()
+    interface.access_configs = [Mock()]  # Has public IP
+    instance.network_interfaces = [interface]
+    return instance
+
+@pytest.mark.asyncio
+async def test_scan_network_default_network(mock_config, mock_credentials, mock_network):
+    with patch('builtins.open', mock_open(read_data=SAMPLE_BENCHMARK_YAML)):
+        scanner = Scanner(mock_config, mock_credentials)
+        with patch.object(scanner.networks_client, 'list', return_value=[mock_network]), \
+             patch.object(scanner.compute_client, 'list', return_value=[]), \
+             patch.object(scanner.subnets_client, 'list', return_value=[]), \
+             patch.object(scanner.firewall_client, 'list', return_value=[]), \
+             patch.object(scanner.dns_client, 'list', return_value=[]):
+            findings = await scanner._scan_network()
+            assert len(findings) == 1
+            assert findings[0].cis_id == "3.1"
+            assert findings[0].resource_type == "network"
+            assert findings[0].status == "Non-Compliant"
+
+@pytest.mark.asyncio
+async def test_scan_network_public_ip(mock_config, mock_credentials, mock_instance):
+    with patch('builtins.open', mock_open(read_data=SAMPLE_BENCHMARK_YAML)):
+        scanner = Scanner(mock_config, mock_credentials)
+        with patch.object(scanner.networks_client, 'list', return_value=[]), \
+             patch.object(scanner.compute_client, 'list', return_value=[mock_instance]), \
+             patch.object(scanner.subnets_client, 'list', return_value=[]), \
+             patch.object(scanner.firewall_client, 'list', return_value=[]), \
+             patch.object(scanner.dns_client, 'list', return_value=[]):
+            findings = await scanner._scan_network()
+            assert len(findings) == 1
+            assert findings[0].cis_id == "4.9"
+            assert findings[0].resource_type == "compute_instance"
+            assert findings[0].status == "Non-Compliant"

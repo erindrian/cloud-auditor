@@ -1,5 +1,7 @@
 google-cloud-storage>=2.10.0
 google-cloud-resource-manager>=1.10.0
+google-cloud-compute>=2.0.0
+google-cloud-dns>=0.34.0
 google-auth>=2.22.0
 pyyaml>=6.0.1
 tenacity>=8.2.3

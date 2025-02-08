@@ -1,10 +1,10 @@
 import os
 import csv
+import yaml
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, asdict
 from src.utils.logger import Logger
-from src.utils.cis_benchmark_library import CIS_BENCHMARK_LIBRARY
 from src.modules.scanner import Finding
 
 class Reporter:
@@ -13,6 +13,18 @@ class Reporter:
         self.config = config_manager
         self.logger = None  # Will be initialized when needed
         self.base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        # Load CIS benchmarks
+        self.benchmarks = self._load_cis_benchmarks()
+
+    def _load_cis_benchmarks(self) -> Dict[str, Any]:
+        """Load CIS benchmarks from YAML file."""
+        try:
+            benchmarks_file = os.path.join(self.base_dir, 'src/config/cis_benchmarks.yaml')
+            with open(benchmarks_file, 'r') as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            print(f"Error loading CIS benchmarks: {str(e)}")
+            raise
 
     def _get_logger(self):
         """Get or initialize logger."""
@@ -25,7 +37,7 @@ class Reporter:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-    def _print_table(self, findings: List[Dict[str, Any]]) -> None:
+    def _print_findings_table(self, findings: List[Dict[str, Any]]) -> None:
         """Print findings in a table format."""
         if not findings:
             print("\nNo security findings detected.")
@@ -73,7 +85,54 @@ class Reporter:
 
         print(bottom_border)
         print(f"\nTotal findings: {len(findings)}")
-        print(f"Report saved to: {self.base_dir}/reports/")
+
+    def _print_compliance_table(self, benchmarks: List[Dict[str, Any]], findings: List[Finding]) -> None:
+        """Print CIS benchmark compliance status table."""
+        # Define column widths
+        widths = {
+            "CIS ID": 8,
+            "Title": 50,
+            "Level": 10,
+            "Status": 12
+        }
+
+        # Print header
+        header = "│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {:<{w[Status]}} │".format(
+            "CIS ID", "Title", "Level", "Status", w=widths
+        )
+        separator = "├" + "─" * (widths["CIS ID"] + 2) + "┼" + "─" * (widths["Title"] + 2) + "┼" + "─" * (widths["Level"] + 2) + "┼" + "─" * (widths["Status"] + 2) + "┤"
+        top_border = "┌" + "─" * (widths["CIS ID"] + 2) + "┬" + "─" * (widths["Title"] + 2) + "┬" + "─" * (widths["Level"] + 2) + "┬" + "─" * (widths["Status"] + 2) + "┐"
+        bottom_border = "└" + "─" * (widths["CIS ID"] + 2) + "┴" + "─" * (widths["Title"] + 2) + "┴" + "─" * (widths["Level"] + 2) + "┴" + "─" * (widths["Status"] + 2) + "┘"
+
+        print("\nCIS Benchmark Compliance Status:")
+        print(top_border)
+        print(header)
+        print(separator)
+
+        # Get list of non-compliant CIS IDs
+        non_compliant_ids = {f.cis_id for f in findings}
+
+        # Print status for each benchmark
+        for benchmark in benchmarks:
+            title = benchmark["title"]
+            if len(title) > widths["Title"]:
+                title = title[:widths["Title"]-3] + "..."
+
+            status = "Non-Compliant" if benchmark["id"] in non_compliant_ids else "Compliant"
+            status_color = "\033[91m" if status == "Non-Compliant" else "\033[92m"  # Red for non-compliant, green for compliant
+
+            row = "│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {}{:<{w[Status]}}\033[0m │".format(
+                benchmark["id"],
+                title,
+                benchmark["profile_applicability"],
+                status_color,
+                status,
+                w=widths
+            )
+            print(row)
+
+        print(bottom_border)
+        print(f"\nReport saved to: {self.base_dir}/reports/")
 
     def _save_csv_report(self, findings: List[Dict[str, Any]], timestamp: str) -> str:
         """Save report in CSV format."""
@@ -86,7 +145,7 @@ class Reporter:
             headers = [
                 "Finding Description", "CIS Control ID", "Profile Applicability",
                 "Risk Level", "Resource ID", "Resource Type", "Remediation Steps",
-                "Impact", "Details"
+                "Details"
             ]
             
             with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -94,18 +153,18 @@ class Reporter:
                 writer.writeheader()
                 
                 for finding in findings:
-                    cis_mapping = CIS_BENCHMARK_LIBRARY[finding["cis_id"]]
-                    writer.writerow({
-                        "Finding Description": finding["description"],
-                        "CIS Control ID": cis_mapping["id"],
-                        "Profile Applicability": cis_mapping["profile_applicability"],
-                        "Risk Level": finding["risk_level"],
-                        "Resource ID": finding["resource_id"],
-                        "Resource Type": finding["resource_type"],
-                        "Remediation Steps": cis_mapping["remediation"],
-                        "Impact": cis_mapping["impact"],
-                        "Details": str(finding["details"]) if finding["details"] else ""
-                    })
+                    benchmark = next((b for b in self.benchmarks['cis_benchmarks'] if b['id'] == finding['cis_id']), None)
+                    if benchmark:
+                        writer.writerow({
+                            "Finding Description": finding["description"],
+                            "CIS Control ID": benchmark["id"],
+                            "Profile Applicability": benchmark["profile_applicability"],
+                            "Risk Level": finding["risk_level"],
+                            "Resource ID": finding["resource_id"],
+                            "Resource Type": finding["resource_type"],
+                            "Remediation Steps": "\n".join(benchmark["remediation"]["steps"]),
+                            "Details": str(finding["details"]) if finding["details"] else ""
+                        })
             
             logger.info(f"CSV report saved successfully to {filepath}")
             return filepath
@@ -140,16 +199,19 @@ class Reporter:
                 detailed_findings.append(detailed_finding)
                 
                 # Add to compliance summary
-                compliance_summary.append({
-                    "cis_id": finding.cis_id,
-                    "title": CIS_BENCHMARK_LIBRARY[finding.cis_id]["title"],
-                    "compliant": finding.status == "Compliant",
-                    "risk_level": finding.risk_level,
-                    "remediation_status": "Remediated" if finding.status == "Compliant" else "Pending"
-                })
+                benchmark = next((b for b in self.benchmarks['cis_benchmarks'] if b['id'] == finding.cis_id), None)
+                if benchmark:
+                    compliance_summary.append({
+                        "cis_id": finding.cis_id,
+                        "title": benchmark['title'],
+                        "compliant": finding.status == "Compliant",
+                        "risk_level": finding.risk_level,
+                        "remediation_status": "Remediated" if finding.status == "Compliant" else "Pending"
+                    })
             
-            # Print findings table
-            self._print_table(detailed_findings)
+            # Print findings and compliance tables
+            self._print_findings_table(detailed_findings)
+            self._print_compliance_table(self.benchmarks['cis_benchmarks'], findings)
             
             # Create report object
             report = {

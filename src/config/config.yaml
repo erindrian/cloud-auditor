@@ -1,5 +1,5 @@
 gcp:
-  service_account_key_path: credentials/test-project-450103-5848b7183463.json
+  service_account_key_path: credentials/test-project-450103-5848b7183463 18.33.58.json
   project_id: test-project-450103
 
 logging:

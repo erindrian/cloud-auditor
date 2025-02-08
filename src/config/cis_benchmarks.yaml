@@ -102,3 +102,69 @@ cis_benchmarks:
     default_value: "By default, users do not have both roles assigned simultaneously."
     references:
       - "https://cloud.google.com/iam/docs/service-accounts"
+
+  # Network Configurations
+  - id: "3.1"
+    title: "Ensure That the Default Network Does Not Exist in a Project (Automated)"
+    profile_applicability: "Level 2"
+    description: "To prevent use of default network, a project should not have a default network."
+    rationale: "The default network has preconfigured insecure firewall rules."
+    audit:
+      gcloud_command: "gcloud compute networks list"
+    remediation:
+      steps:
+        - "Delete the default network if it exists."
+    references:
+      - "https://cloud.google.com/vpc/docs/using-firewalls"
+
+  - id: "3.3"
+    title: "Ensure That DNSSEC Is Enabled for Cloud DNS (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure DNSSEC is enabled for Cloud DNS."
+    rationale: "DNSSEC provides origin authentication and integrity verification of DNS data."
+    audit:
+      gcloud_command: "gcloud dns managed-zones describe [ZONE_NAME]"
+    remediation:
+      steps:
+        - "Enable DNSSEC for the managed zone."
+    references:
+      - "https://cloud.google.com/dns/dnssec-config#enabling"
+
+  - id: "4.9"
+    title: "Ensure That Compute Instances Do Not Have Public IP Addresses (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure that Compute Engine instances do not have public IP addresses."
+    rationale: "Public IP addresses expose instances directly to the internet, increasing the attack surface."
+    audit:
+      gcloud_command: "gcloud compute instances list --filter='networkInterfaces[0].accessConfigs[0].natIP:*'"
+    remediation:
+      steps:
+        - "Remove public IP addresses from instances by editing the instance configuration."
+    references:
+      - "https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address"
+
+  - id: "4.10"
+    title: "Ensure That VPC Flow Logs Are Enabled for Every Subnet (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure that VPC flow logs are enabled for every subnet."
+    rationale: "VPC flow logs provide visibility into network traffic, aiding in monitoring and forensic analysis."
+    audit:
+      gcloud_command: "gcloud compute networks subnets list --format=json | jq '.[] | select(.enableFlowLogs == false)'"
+    remediation:
+      steps:
+        - "Enable VPC flow logs for each subnet."
+    references:
+      - "https://cloud.google.com/vpc/docs/using-flow-logs"
+
+  - id: "4.11"
+    title: "Ensure That Firewall Rules Do Not Allow Ingress From '0.0.0.0/0' to TCP Port 22 (Automated)"
+    profile_applicability: "Level 1"
+    description: "Ensure that firewall rules do not allow ingress from '0.0.0.0/0' to TCP port 22."
+    rationale: "Allowing unrestricted SSH access increases the risk of unauthorized access."
+    audit:
+      gcloud_command: "gcloud compute firewall-rules list --filter='allowed[].ports[].list().contains(\"22\") AND sourceRanges.list().contains(\"0.0.0.0/0\")'"
+    remediation:
+      steps:
+        - "Restrict SSH access to specific IP ranges or use Identity-Aware Proxy (IAP) for secure access."
+    references:
+      - "https://cloud.google.com/vpc/docs/firewalls"
