@@ -710,3 +710,297 @@ message: "Cloud Resource Manager API has not been used in project 379849595138 b
 {"timestamp": "2025-02-08T18:46:45.f" "level": "INFO" "logger": "src.modules.notifier" "message": "No notification channels enabled" "module": "notifier" "function": "send_notifications" "line": 236 "taskName": "Task-1" "message": "No notification channels enabled" "asctime": "2025-02-08T18:46:45.f"}
 {"timestamp": "2025-02-08T18:46:45.f" "level": "INFO" "logger": "__main__" "message": "Notifications sent successfully" "module": "main" "function": "run" "line": 70 "taskName": "Task-1" "message": "Notifications sent successfully" "asctime": "2025-02-08T18:46:45.f"}
 {"timestamp": "2025-02-08T18:46:45.f" "level": "INFO" "logger": "__main__" "message": "Cloud Security Auditor completed successfully" "module": "main" "function": "run" "line": 73 "taskName": "Task-1" "message": "Cloud Security Auditor completed successfully" "asctime": "2025-02-08T18:46:45.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "INFO" "logger": "__main__" "message": "Logging initialized successfully" "module": "main" "function": "_setup_logging" "line": 30 "taskName": "None" "message": "Logging initialized successfully" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "INFO" "logger": "__main__" "message": "GCP credentials initialized successfully" "module": "main" "function": "_setup_credentials" "line": 44 "taskName": "None" "message": "GCP credentials initialized successfully" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "DEBUG" "logger": "asyncio" "message": "Using selector: KqueueSelector" "module": "selector_events" "function": "__init__" "line": 64 "taskName": "None" "message": "Using selector: KqueueSelector" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "INFO" "logger": "__main__" "message": "Starting Cloud Security Auditor" "module": "main" "function": "run" "line": 53 "taskName": "Task-1" "message": "Starting Cloud Security Auditor" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "DEBUG" "logger": "urllib3.util.retry" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "module": "retry" "function": "from_int" "line": 286 "taskName": "Task-2" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-2" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-2" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:09.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-2" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "asctime": "2025-02-08T18:52:09.f"}
+{"timestamp": "2025-02-08T18:52:10.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-2" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "asctime": "2025-02-08T18:52:10.f"}
+{"timestamp": "2025-02-08T18:52:10.f" "level": "INFO" "logger": "src.modules.scanner" "message": "Scanning batch of 1 storage buckets" "module": "scanner" "function": "_scan_storage" "line": 212 "taskName": "Task-2" "message": "Scanning batch of 1 storage buckets" "asctime": "2025-02-08T18:52:10.f"}
+{"timestamp": "2025-02-08T18:52:11.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "_scan_iam" "line": 291 "taskName": "Task-3" "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "stack_trace": "Traceback (most recent call last):
+  File "/Users/erindrian/Desktop/cloud-auditor/src/modules/scanner.py", line 259, in _scan_iam
+    policy = self.resource_manager_client.get_iam_policy(request=request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/cloud/resourcemanager_v3/services/projects/client.py", line 1927, in get_iam_policy
+    response = rpc(
+        request,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/gapic_v1/method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 293, in retry_wrapped_func
+    return retry_target(
+        target,
+    ...<3 lines>...
+        on_error=on_error,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 153, in retry_target
+    _retry_error_helper(
+    ~~~~~~~~~~~~~~~~~~~^
+        exc,
+        ^^^^
+    ...<6 lines>...
+        timeout,
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_base.py", line 212, in _retry_error_helper
+    raise final_exc from source_exc
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 144, in retry_target
+    result = target()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/grpc_helpers.py", line 78, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.PermissionDenied: 403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]
+" "message": "Error in IAM scanning" "asctime": "2025-02-08T18:52:11.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "module": "scanner" "function": "_scan_compute" "line": 352 "taskName": "Task-4" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "_scan_compute" "line": 362 "taskName": "Task-4" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "stack_trace": "Traceback (most recent call last):
+  File "/Users/erindrian/Desktop/cloud-auditor/src/modules/scanner.py", line 322, in _scan_compute
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 579, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1.
+" "message": "Error in compute scanning" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "src.modules.scanner" "message": "Scanning bucket: misconfigured_public_bucket" "module": "scanner" "function": "_scan_storage_bucket" "line": 99 "taskName": "Task-5" "message": "Scanning bucket: misconfigured_public_bucket" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "WARNING" "logger": "src.modules.scanner" "message": "Bucket misconfigured_public_bucket is publicly accessible" "module": "scanner" "function": "_scan_storage_bucket" "line": 108 "taskName": "Task-5" "message": "Bucket misconfigured_public_bucket is publicly accessible" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "scan" "line": 407 "taskName": "Task-1" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in compute scanning" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "__main__" "message": "Scanning completed. Found 1 findings." "module": "main" "function": "run" "line": 58 "taskName": "Task-1" "message": "Scanning completed. Found 1 findings." "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Generating security audit report" "module": "reporter" "function": "generate_report" "line": 180 "taskName": "Task-1" "message": "Generating security audit report" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "src.modules.reporter" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250208_185213.csv" "module": "reporter" "function": "_save_csv_report" "line": 169 "taskName": "Task-1" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250208_185213.csv" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Report generation completed successfully" "module": "reporter" "function": "generate_report" "line": 237 "taskName": "Task-1" "message": "Report generation completed successfully" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "__main__" "message": "Report generated successfully" "module": "main" "function": "run" "line": 64 "taskName": "Task-1" "message": "Report generated successfully" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "src.modules.notifier" "message": "No notification channels enabled" "module": "notifier" "function": "send_notifications" "line": 236 "taskName": "Task-1" "message": "No notification channels enabled" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "__main__" "message": "Notifications sent successfully" "module": "main" "function": "run" "line": 70 "taskName": "Task-1" "message": "Notifications sent successfully" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:13.f" "level": "INFO" "logger": "__main__" "message": "Cloud Security Auditor completed successfully" "module": "main" "function": "run" "line": 73 "taskName": "Task-1" "message": "Cloud Security Auditor completed successfully" "asctime": "2025-02-08T18:52:13.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "INFO" "logger": "__main__" "message": "Logging initialized successfully" "module": "main" "function": "_setup_logging" "line": 30 "taskName": "None" "message": "Logging initialized successfully" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "INFO" "logger": "__main__" "message": "GCP credentials initialized successfully" "module": "main" "function": "_setup_credentials" "line": 44 "taskName": "None" "message": "GCP credentials initialized successfully" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "asyncio" "message": "Using selector: KqueueSelector" "module": "selector_events" "function": "__init__" "line": 64 "taskName": "None" "message": "Using selector: KqueueSelector" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "INFO" "logger": "__main__" "message": "Starting Cloud Security Auditor" "module": "main" "function": "run" "line": 53 "taskName": "Task-1" "message": "Starting Cloud Security Auditor" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "urllib3.util.retry" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "module": "retry" "function": "from_int" "line": 286 "taskName": "Task-2" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-2" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-2" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-2" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-2" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:51.f" "level": "INFO" "logger": "src.modules.scanner" "message": "Scanning batch of 1 storage buckets" "module": "scanner" "function": "_scan_storage" "line": 212 "taskName": "Task-2" "message": "Scanning batch of 1 storage buckets" "asctime": "2025-02-08T18:52:51.f"}
+{"timestamp": "2025-02-08T18:52:52.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "_scan_iam" "line": 291 "taskName": "Task-3" "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "stack_trace": "Traceback (most recent call last):
+  File "/Users/erindrian/Desktop/cloud-auditor/src/modules/scanner.py", line 259, in _scan_iam
+    policy = self.resource_manager_client.get_iam_policy(request=request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/cloud/resourcemanager_v3/services/projects/client.py", line 1927, in get_iam_policy
+    response = rpc(
+        request,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/gapic_v1/method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 293, in retry_wrapped_func
+    return retry_target(
+        target,
+    ...<3 lines>...
+        on_error=on_error,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 153, in retry_target
+    _retry_error_helper(
+    ~~~~~~~~~~~~~~~~~~~^
+        exc,
+        ^^^^
+    ...<6 lines>...
+        timeout,
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_base.py", line 212, in _retry_error_helper
+    raise final_exc from source_exc
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/retry/retry_unary.py", line 144, in retry_target
+    result = target()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google/api_core/grpc_helpers.py", line 78, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.PermissionDenied: 403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]
+" "message": "Error in IAM scanning" "asctime": "2025-02-08T18:52:52.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "module": "scanner" "function": "_scan_compute" "line": 354 "taskName": "Task-4" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "_scan_compute" "line": 364 "taskName": "Task-4" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "stack_trace": "Traceback (most recent call last):
+  File "/Users/erindrian/Desktop/cloud-auditor/src/modules/scanner.py", line 322, in _scan_compute
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 579, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1.
+" "message": "Error in compute scanning" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "src.modules.scanner" "message": "Scanning bucket: misconfigured_public_bucket" "module": "scanner" "function": "_scan_storage_bucket" "line": 99 "taskName": "Task-5" "message": "Scanning bucket: misconfigured_public_bucket" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "WARNING" "logger": "src.modules.scanner" "message": "Bucket misconfigured_public_bucket is publicly accessible" "module": "scanner" "function": "_scan_storage_bucket" "line": 108 "taskName": "Task-5" "message": "Bucket misconfigured_public_bucket is publicly accessible" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "scan" "line": 409 "taskName": "Task-1" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in compute scanning" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "__main__" "message": "Scanning completed. Found 1 findings." "module": "main" "function": "run" "line": 58 "taskName": "Task-1" "message": "Scanning completed. Found 1 findings." "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Generating security audit report" "module": "reporter" "function": "generate_report" "line": 180 "taskName": "Task-1" "message": "Generating security audit report" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "src.modules.reporter" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250208_185253.csv" "module": "reporter" "function": "_save_csv_report" "line": 169 "taskName": "Task-1" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250208_185253.csv" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Report generation completed successfully" "module": "reporter" "function": "generate_report" "line": 237 "taskName": "Task-1" "message": "Report generation completed successfully" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "__main__" "message": "Report generated successfully" "module": "main" "function": "run" "line": 64 "taskName": "Task-1" "message": "Report generated successfully" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "src.modules.notifier" "message": "No notification channels enabled" "module": "notifier" "function": "send_notifications" "line": 236 "taskName": "Task-1" "message": "No notification channels enabled" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "__main__" "message": "Notifications sent successfully" "module": "main" "function": "run" "line": 70 "taskName": "Task-1" "message": "Notifications sent successfully" "asctime": "2025-02-08T18:52:53.f"}
+{"timestamp": "2025-02-08T18:52:53.f" "level": "INFO" "logger": "__main__" "message": "Cloud Security Auditor completed successfully" "module": "main" "function": "run" "line": 73 "taskName": "Task-1" "message": "Cloud Security Auditor completed successfully" "asctime": "2025-02-08T18:52:53.f"}

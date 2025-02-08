@@ -168,3 +168,37 @@ cis_benchmarks:
         - "Restrict SSH access to specific IP ranges or use Identity-Aware Proxy (IAP) for secure access."
     references:
       - "https://cloud.google.com/vpc/docs/firewalls"
+
+  - id: "4.9"
+    title: "Ensure That Compute Instances Do Not Have Public IP Addresses (Automated)"
+    profile_applicability: "Level 2"
+    description: "Compute instances should not be configured to have external IP addresses."
+    rationale: "To reduce your attack surface, Compute instances should not have public IP addresses. Instead, instances should be configured behind load balancers to minimize their exposure to the internet."
+    impact: "Removing the external IP address from your Compute instance may cause some applications to stop working."
+    audit:
+      gcloud_command: "gcloud compute instances list --format=json"
+      steps:
+        - "The output should not contain an `accessConfigs` section under `networkInterfaces`. Note that the `natIP` value is present only for instances that are running or stopped but have a static IP address."
+        - "For instances that are stopped and configured to have an ephemeral public IP address, the `natIP` field will not be present."
+      exception: "Instances created by GKE should be excluded because some of them have external IP addresses and cannot be changed by editing the instance settings. These instances have names that start with 'gke-' and are labeled 'goog-gke-node'."
+    remediation:
+      steps:
+        - "Go to the VM instances page by visiting: https://console.cloud.google.com/compute/instances."
+        - "Click on the instance name to go to the Instance detail page."
+        - "Click Edit."
+        - "For each Network interface, ensure that External IP is set to None."
+        - "Click Done and then click Save."
+      gcloud_steps:
+        - "Describe the instance properties: `gcloud compute instances describe <INSTANCE_NAME> --zone=<ZONE>`."
+        - "Identify the access config name that contains the external IP address."
+        - "Delete the access config: `gcloud compute instances delete-access-config <INSTANCE_NAME> --zone=<ZONE> --access-config-name <ACCESS_CONFIG_NAME>`."
+    prevention:
+      steps:
+        - "Configure the 'Define allowed external IPs for VM instances' Organization Policy to prevent VMs from being configured with public IP addresses. Learn more at: https://console.cloud.google.com/orgpolicies/compute-vmExternalIpAccess."
+    default_value: "By default, Compute instances have a public IP address."
+    references:
+      - "https://cloud.google.com/load-balancing/docs/backend-service#backends_and_external_ip_addresses"
+      - "https://cloud.google.com/compute/docs/instances/connecting-advanced#sshbetweeninstances"
+      - "https://cloud.google.com/compute/docs/instances/connecting-to-instance"
+      - "https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#unassign_ip"
+      - "https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints"

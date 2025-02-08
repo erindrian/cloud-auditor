@@ -5,16 +5,20 @@ A Python-based tool for auditing cloud security configurations in GCP environmen
 ## Features
 
 - **Security Scanning**
-  - Storage bucket access controls
-  - IAM role configurations
+  - Storage bucket access controls and public access prevention
+  - IAM role configurations and service account permissions
+  - Compute instance network configurations and public IP detection
+  - CIS Benchmark compliance checks for GCP resources
   - Parallel scanning with configurable batch sizes
   - Rate limiting and retry mechanisms
 
 - **Reporting**
   - Detailed findings with CIS benchmark mappings
-  - Risk level categorization
+  - Comprehensive compliance status for all CIS benchmarks
+  - Risk level categorization and impact assessment
   - CSV and JSON report formats
-  - Executive summaries
+  - Executive summaries with compliance statistics
+  - Color-coded status indicators in terminal output
 
 - **Notifications**
   - Email notifications with HTML formatting
@@ -26,6 +30,11 @@ A Python-based tool for auditing cloud security configurations in GCP environmen
 
 - Python 3.x
 - GCP Service Account with appropriate permissions
+- Enabled GCP APIs:
+  - Cloud Storage API
+  - Cloud Resource Manager API
+  - Compute Engine API
+- Authenticated gcloud CLI (`gcloud auth login`)
 - SMTP server (for email notifications)
 - Slack webhook URL (for Slack notifications)
 
@@ -85,6 +94,7 @@ scanner:
   max_workers: ${SCANNER_MAX_WORKERS:-3}
   timeout: ${SCANNER_TIMEOUT:-30}
   batch_size: ${SCANNER_BATCH_SIZE:-100}
+  cis_benchmarks_file: config/cis_benchmarks.yaml  # CIS benchmark definitions
 ```
 
 ### Environment Variables
@@ -123,7 +133,31 @@ Optional environment variables with defaults:
 tail -f logs/app.log
 ```
 
-3. Review the reports in the `reports` directory.
+3. Review the reports in the `reports` directory. The scan output includes:
+   - Security findings table showing detected issues
+   - CIS benchmark compliance status for all checks
+   - Detailed CSV report with findings and remediation steps
+
+## CIS Benchmarks
+
+The tool checks compliance with the following CIS benchmarks:
+
+### Storage
+- 5.1: Ensure Cloud Storage buckets are not anonymously or publicly accessible
+- 5.2: Ensure Cloud Storage buckets have uniform bucket-level access enabled
+
+### IAM
+- 1.4: Ensure only GCP-managed service account keys exist
+- 1.5: Ensure service accounts have no admin privileges
+- 1.6: Ensure IAM users are not assigned service account user/token creator roles at project level
+- 1.8: Enforce separation of duties in service account role assignments
+
+### Network & Compute
+- 3.1: Ensure default network does not exist in project
+- 3.3: Ensure DNSSEC is enabled for Cloud DNS
+- 4.9: Ensure compute instances do not have public IP addresses
+- 4.10: Ensure VPC flow logs are enabled for every subnet
+- 4.11: Ensure firewall rules do not allow unrestricted SSH access
 
 ## Project Structure
 

@@ -296,21 +296,96 @@ class Scanner:
         print(f"IAM scan complete. Found {len(findings)} findings.")
         return findings
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        retry=retry_if_exception_type(google_exceptions.RetryError)
+    )
+    async def _scan_compute(self) -> List[Finding]:
+        """Scan compute instances for public IPs."""
+        findings = []
+        try:
+            logger = self._get_logger()
+            print("Starting compute scan...")
+
+            # Use gcloud command to list instances with public IPs
+            import subprocess
+            import json
+
+            cmd = [
+                "gcloud", "compute", "instances", "list",
+                "--format=json",
+                f"--project={self.project_id}"
+            ]
+
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                instances = json.loads(result.stdout)
+
+                for instance in instances:
+                    # Skip GKE nodes as per benchmark exception
+                    if instance['name'].startswith('gke-') or 'labels' in instance and instance['labels'].get('goog-gke-node'):
+                        continue
+
+                    for interface in instance.get('networkInterfaces', []):
+                        if 'accessConfigs' in interface:
+                            # Get the Level 2 version of 4.9 benchmark
+                            benchmark = next((b for b in self.benchmarks['cis_benchmarks'] 
+                                           if b['id'] == '4.9' and b['profile_applicability'] == 'Level 2'), None)
+                            if benchmark:
+                                findings.append(Finding(
+                                    description=f"Instance {instance['name']} has public IP address",
+                                    cis_id=benchmark['id'],
+                                    risk_level="High",
+                                    status="Non-Compliant",
+                                    resource_id=instance['name'],
+                                    resource_type="compute_instance",
+                                    title=benchmark['title'],
+                                    profile_applicability=benchmark['profile_applicability'],
+                                    rationale=benchmark['rationale'],
+                                    audit_command=benchmark['audit']['gcloud_command'],
+                                    remediation_steps=benchmark['remediation']['steps'],
+                                    prevention_steps=benchmark['prevention']['steps'],
+                                    references=benchmark['references']
+                                ))
+                            break  # Found a public IP, no need to check other interfaces
+
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Error running gcloud command: {e.stderr}")
+                print(f"Error running gcloud command: {e.stderr}")
+                raise
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing gcloud output: {e}")
+                print(f"Error parsing gcloud output: {e}")
+                raise
+
+        except Exception as e:
+            logger = self._get_logger()
+            logger.error("Error in compute scanning",
+                        extra={"error": str(e), "stack_trace": traceback.format_exc()})
+            print(f"Error in compute scanning: {str(e)}")
+            traceback.print_exc()
+            raise
+
+        print(f"Compute scan complete. Found {len(findings)} findings.")
+        return findings
+
     async def scan(self) -> List[Finding]:
         """Perform parallel scanning of all resources."""
         all_findings = []
         try:
             print("Starting security scan...")
             logger = self._get_logger()
-            # Run storage and IAM scans concurrently
+            # Run storage, IAM, and compute scans concurrently
             print("Starting concurrent scans...")
             storage_task = asyncio.create_task(self._scan_storage())
             iam_task = asyncio.create_task(self._scan_iam())
+            compute_task = asyncio.create_task(self._scan_compute())
             
-            # Wait for both scans to complete
+            # Wait for all scans to complete
             print("Waiting for scans to complete...")
-            storage_findings, iam_findings = await asyncio.gather(
-                storage_task, iam_task, return_exceptions=True
+            storage_findings, iam_findings, compute_findings = await asyncio.gather(
+                storage_task, iam_task, compute_task, return_exceptions=True
             )
             
             # Process storage findings
@@ -328,6 +403,14 @@ class Scanner:
                 print(f"Error in IAM scanning: {str(iam_findings)}")
             else:
                 all_findings.extend(iam_findings)
+
+            # Process compute findings
+            if isinstance(compute_findings, Exception):
+                logger.error("Error in compute scanning",
+                                extra={"error": str(compute_findings)})
+                print(f"Error in compute scanning: {str(compute_findings)}")
+            else:
+                all_findings.extend(compute_findings)
             
         except Exception as e:
             logger = self._get_logger()
