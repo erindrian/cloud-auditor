@@ -36,11 +36,6 @@ class Logger:
             datefmt="%Y-%m-%dT%H:%M:%S.%f"
         )
         
-        # Create console formatter
-        console_formatter = logging.Formatter(
-            fmt='%(levelname)s - %(message)s'
-        )
-        
         # Add custom formatter to include extra fields for JSON
         old_format = json_formatter._fmt
         
@@ -66,7 +61,7 @@ class Logger:
             
         json_formatter.format = format
         
-        # Create handlers
+        # Create file handler
         file_handler = logging.handlers.RotatingFileHandler(
             log_file,
             maxBytes=max_size,
@@ -74,17 +69,13 @@ class Logger:
         )
         file_handler.setFormatter(json_formatter)
         
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(console_formatter)
-        
         # Configure root logger
         root_logger = logging.getLogger()
         root_logger.setLevel(log_level)
         
-        # Remove any existing handlers and add our handlers
+        # Remove any existing handlers and add only file handler
         root_logger.handlers = []
         root_logger.addHandler(file_handler)
-        root_logger.addHandler(console_handler)
         
         cls._initialized = True
 

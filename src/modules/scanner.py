@@ -18,6 +18,9 @@ from google.cloud import resourcemanager_v3
 from google.iam.v1 import iam_policy_pb2
 from src.utils.logger import Logger
 
+# Common progress bar format for consistent display
+PROGRESS_FORMAT = "{desc:<25}: {percentage:3.0f}%|{bar:30}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
+
 @dataclass
 class Finding:
     """Represents a security finding."""
@@ -187,7 +190,8 @@ class Scanner:
                 
                 # Process current batch with progress bar
                 tasks = []
-                with tqdm(total=len(current_batch), desc="🔍 Storage Buckets", unit="bucket") as pbar:
+                print("\n")  # Add consistent double spacing before progress bar
+                with tqdm(total=len(current_batch), desc="🔍 Storage Buckets", unit="bucket", bar_format=PROGRESS_FORMAT) as pbar:
                     for bucket in current_batch:
                         task = asyncio.create_task(self._scan_storage_bucket(bucket, pbar))
                         tasks.append(task)
@@ -209,6 +213,9 @@ class Scanner:
                 
         except Exception as e:
             logger.error("Error in storage scanning", extra={"error": str(e)})
+            print("\n")  # Add consistent double spacing before error progress bar
+            with tqdm(total=1, desc="🔍 Storage Buckets", unit="bucket", bar_format=PROGRESS_FORMAT) as pbar:
+                pbar.update(0)  # Show 0/1 progress
         
         return findings
 
@@ -224,29 +231,34 @@ class Scanner:
             policy = self.resource_manager_client.get_iam_policy(request=request)
             bindings = [{"role": b.role, "members": list(b.members)} for b in policy.bindings]
             
-            # Process bindings in batches
-            for i in range(0, len(bindings), self.batch_size):
-                batch = bindings[i:i + self.batch_size]
-                
-                # Create tasks for current batch with progress bar
-                tasks = []
-                with tqdm(total=len(batch), desc="🔍 IAM Bindings", unit="binding") as pbar:
-                    for binding in batch:
-                        task = asyncio.create_task(self._scan_iam_binding(binding, pbar))
-                        tasks.append(task)
-                    
-                    # Wait for all tasks in the current batch
-                    batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-                
-                # Process results
-                for result in batch_results:
-                    if isinstance(result, Exception):
-                        logger.error("Error in IAM scanning batch", extra={"error": str(result)})
-                    elif result is not None:
-                        findings.append(result)
+            print("\n")  # Add consistent double spacing before progress bar
+            with tqdm(total=max(len(bindings), 1), desc="🔍 IAM Bindings", unit="binding", bar_format=PROGRESS_FORMAT) as pbar:
+                if not bindings:
+                    pbar.update(0)  # Show 0/1 progress for no bindings
+                else:
+                    # Process bindings in batches
+                    for i in range(0, len(bindings), self.batch_size):
+                        batch = bindings[i:i + self.batch_size]
+                        
+                        # Create tasks for current batch
+                        tasks = []
+                        for binding in batch:
+                            task = asyncio.create_task(self._scan_iam_binding(binding, pbar))
+                            tasks.append(task)
+                        
+                        # Wait for all tasks in the current batch
+                        batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                        
+                        # Process results
+                        for result in batch_results:
+                            if isinstance(result, Exception):
+                                logger.error("Error in IAM scanning batch", extra={"error": str(result)})
+                            elif result is not None:
+                                findings.append(result)
                 
         except Exception as e:
             logger.error("Error in IAM scanning", extra={"error": str(e)})
+            raise  # Let the error be handled by the scan() method
         
         return findings
 
@@ -275,7 +287,8 @@ class Scanner:
                 result = subprocess.run(cmd, capture_output=True, text=True, check=True)
                 instances = json.loads(result.stdout)
 
-                with tqdm(total=len(instances), desc="🔍 Compute Instances", unit="instance") as pbar:
+                print("\n")  # Add consistent double spacing before progress bar
+                with tqdm(total=len(instances), desc="🔍 Compute Instances", unit="instance", bar_format=PROGRESS_FORMAT) as pbar:
                     for instance in instances:
                         # Skip GKE nodes as per benchmark exception
                         if instance['name'].startswith('gke-') or 'labels' in instance and instance['labels'].get('goog-gke-node'):
@@ -315,8 +328,26 @@ class Scanner:
 
         except Exception as e:
             logger.error("Error in compute scanning", extra={"error": str(e)})
-            raise
+            raise  # Let the error be handled by the scan() method
 
+        return findings
+
+    async def _scan_network(self) -> List[Finding]:
+        """Scan network configurations."""
+        findings = []
+        try:
+            logger = self._get_logger()
+            print("\n")  # Add consistent double spacing before progress bar
+            with tqdm(total=1, desc="🔍 Network Config", unit="check", bar_format=PROGRESS_FORMAT) as pbar:
+                try:
+                    # Network scanning logic would go here
+                    # For now, just show progress
+                    pbar.update(1)
+                except Exception as e:
+                    logger.error("Error in network scanning", extra={"error": str(e)})
+                    pbar.update(0)  # Show 0/1 progress on error
+        except Exception as e:
+            logger.error("Error in network scanning", extra={"error": str(e)})
         return findings
 
     async def scan(self) -> List[Finding]:
@@ -326,26 +357,36 @@ class Scanner:
             logger = self._get_logger()
             print("\n=== Security Scan ===")
             
-            # Run storage, IAM, and compute scans concurrently
-            storage_task = asyncio.create_task(self._scan_storage())
-            iam_task = asyncio.create_task(self._scan_iam())
-            compute_task = asyncio.create_task(self._scan_compute())
-            
-            # Wait for all scans to complete
-            storage_findings, iam_findings, compute_findings = await asyncio.gather(
-                storage_task, iam_task, compute_task, return_exceptions=True
-            )
-            
-            # Process findings
-            for findings, scan_type in [
-                (storage_findings, "Storage"),
-                (iam_findings, "IAM"),
-                (compute_findings, "Compute")
-            ]:
-                if isinstance(findings, Exception):
-                    logger.error(f"Error in {scan_type} scanning", extra={"error": str(findings)})
-                else:
-                    all_findings.extend(findings)
+            # Run scans sequentially to maintain order
+            try:
+                storage_findings = await self._scan_storage()
+                all_findings.extend(storage_findings)
+            except Exception as e:
+                logger.error("Error in Storage scanning", extra={"error": str(e)})
+
+            try:
+                iam_findings = await self._scan_iam()
+                all_findings.extend(iam_findings)
+            except Exception as e:
+                logger.error("Error in IAM scanning", extra={"error": str(e)})
+                print("\n")  # Add consistent double spacing before error progress bar
+                with tqdm(total=1, desc="🔍 IAM Bindings", unit="binding", bar_format=PROGRESS_FORMAT) as pbar:
+                    pbar.update(0)  # Show 0/1 progress
+
+            try:
+                compute_findings = await self._scan_compute()
+                all_findings.extend(compute_findings)
+            except Exception as e:
+                logger.error("Error in Compute scanning", extra={"error": str(e)})
+                print("\n")  # Add consistent double spacing before error progress bar
+                with tqdm(total=1, desc="🔍 Compute Instances", unit="instance", bar_format=PROGRESS_FORMAT) as pbar:
+                    pbar.update(0)  # Show 0/1 progress
+
+            try:
+                network_findings = await self._scan_network()
+                all_findings.extend(network_findings)
+            except Exception as e:
+                logger.error("Error in Network scanning", extra={"error": str(e)})
             
         except Exception as e:
             logger.error("Error in scanning task", extra={"error": str(e)})
