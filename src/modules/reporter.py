@@ -88,58 +88,44 @@ class Reporter:
 
     def _print_compliance_table(self, benchmarks: List[Dict[str, Any]], findings: List[Finding]) -> None:
         """Print CIS benchmark compliance status table."""
-        # Define column widths (total: 120 chars)
-        widths = {
-            "CIS ID": 10,
-            "Title": 65,
-            "Level": 15,
-            "Status": 30
-        }
-
-        # Print header
-        header = "│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {:<{w[Status]}} │".format(
-            "CIS ID", "Title", "Level", "Status", w=widths
-        )
-        separator = "├" + "─" * (widths["CIS ID"] + 2) + "┼" + "─" * (widths["Title"] + 2) + "┼" + "─" * (widths["Level"] + 2) + "┼" + "─" * (widths["Status"] + 2) + "┤"
-        top_border = "┌" + "─" * (widths["CIS ID"] + 2) + "┬" + "─" * (widths["Title"] + 2) + "┬" + "─" * (widths["Level"] + 2) + "┬" + "─" * (widths["Status"] + 2) + "┐"
-        bottom_border = "└" + "─" * (widths["CIS ID"] + 2) + "┴" + "─" * (widths["Title"] + 2) + "┴" + "─" * (widths["Level"] + 2) + "┴" + "─" * (widths["Status"] + 2) + "┘"
-
-        print("\nCIS Benchmark Compliance Status:")
-        print(top_border)
-        print(header)
-        print(separator)
-
-        # Get list of non-compliant CIS IDs
+        # Pre-compute data for better performance
         non_compliant_ids = {f.cis_id for f in findings}
-
-        # Print status for each benchmark
-        for benchmark in benchmarks:
-            title = benchmark["title"]
-            if len(title) > widths["Title"]:
-                title = title[:widths["Title"]-3] + "..."
-
-            status = "Non-Compliant" if benchmark["id"] in non_compliant_ids else "Compliant"
-            status_color = "\033[91m" if status == "Non-Compliant" else "\033[92m"  # Red for non-compliant, green for compliant
-
-            row = "│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {}{:<{w[Status]}}\033[0m │".format(
-                benchmark["id"],
-                title,
-                benchmark["profile_applicability"],
-                status_color,
-                status,
-                w=widths
-            )
-            print(row)
-
-        print(bottom_border)
-        
-        # Calculate and display compliance score
         total_benchmarks = len(benchmarks)
         compliant_count = total_benchmarks - len(non_compliant_ids)
         compliance_score = (compliant_count / total_benchmarks) * 100 if total_benchmarks > 0 else 0
-        
-        # Color code the compliance score
         score_color = "\033[92m" if compliance_score >= 80 else "\033[93m" if compliance_score >= 50 else "\033[91m"
+
+        # Pre-format strings for better performance
+        widths = {"CIS ID": 10, "Title": 65, "Level": 15, "Status": 30}
+        borders = {
+            "top": "┌" + "─" * (widths["CIS ID"] + 2) + "┬" + "─" * (widths["Title"] + 2) + "┬" + "─" * (widths["Level"] + 2) + "┬" + "─" * (widths["Status"] + 2) + "┐",
+            "sep": "├" + "─" * (widths["CIS ID"] + 2) + "┼" + "─" * (widths["Title"] + 2) + "┼" + "─" * (widths["Level"] + 2) + "┼" + "─" * (widths["Status"] + 2) + "┤",
+            "bottom": "└" + "─" * (widths["CIS ID"] + 2) + "┴" + "─" * (widths["Title"] + 2) + "┴" + "─" * (widths["Level"] + 2) + "┴" + "─" * (widths["Status"] + 2) + "┘"
+        }
+
+        # Pre-format header
+        header = "│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {:<{w[Status]}} │".format(
+            "CIS ID", "Title", "Level", "Status", w=widths
+        )
+
+        # Pre-process benchmarks for display
+        rows = []
+        for benchmark in benchmarks:
+            title = benchmark["title"][:widths["Title"]-3] + "..." if len(benchmark["title"]) > widths["Title"] else benchmark["title"]
+            status = "Non-Compliant" if benchmark["id"] in non_compliant_ids else "Compliant"
+            status_color = "\033[91m" if status == "Non-Compliant" else "\033[92m"
+            rows.append("│ {:<{w[CIS ID]}} │ {:<{w[Title]}} │ {:<{w[Level]}} │ {}{:<{w[Status]}}\033[0m │".format(
+                benchmark["id"], title, benchmark["profile_applicability"],
+                status_color, status, w=widths
+            ))
+
+        # Print all at once for better performance
+        print("\nCIS Benchmark Compliance Status:")
+        print(borders["top"])
+        print(header)
+        print(borders["sep"])
+        print("\n".join(rows))
+        print(borders["bottom"])
         
         print("\nCompliance Summary:")
         print(f"Score: {score_color}{compliance_score:.1f}%\033[0m")

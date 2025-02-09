@@ -17,6 +17,23 @@ Cloud Security Engineer
 - Integration with ticketing systems (JIRA, ServiceNow)
 - Color-coded compliance scoring
 - Progress tracking with visual indicators
+- Secure subprocess execution
+- Input validation and sanitization
+- Timeout handling and error recovery
+- Resource optimization and caching
+
+## Security Features
+
+- Project ID validation to prevent injection attacks
+- Command whitelisting for subprocess execution
+- Restricted shell environment
+- Full path usage for system commands
+- Secure subprocess execution with timeouts
+- Input sanitization and validation
+- Proper error handling and logging
+- Resource cleanup and management
+- Memory optimization and caching
+- Parallel scanning with proper isolation
 
 ## Prerequisites
 
