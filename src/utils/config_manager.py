@@ -13,29 +13,7 @@ class ConfigManager:
         self.config_path = config_path
         self.config = self._load_config()
         self._process_env_vars()  # Process env vars before validation
-        self._print_config()
         self._validate_config()
-
-    def _print_config(self) -> None:
-        """Print configuration in a formatted way."""
-        print("\n=== Cloud Auditor ===")
-        print(f"🔐 Project: {self.config['gcp']['project_id']}")
-        
-        # Print enabled notifications
-        notifications = []
-        if self.config['notifications']['smtp']['enabled']:
-            notifications.append("📧 Email")
-        if self.config['notifications']['slack']['enabled']:
-            notifications.append("💬 Slack")
-        if self.config.get('notifications', {}).get('jira', {}).get('enabled'):
-            notifications.append("🎫 JIRA")
-        if self.config.get('notifications', {}).get('servicenow', {}).get('enabled'):
-            notifications.append("🔧 ServiceNow")
-        
-        if notifications:
-            print(f"📢 Notifications: {' '.join(notifications)}")
-        
-        print("===================\n")
 
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from YAML file."""

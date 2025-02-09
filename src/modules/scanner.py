@@ -18,8 +18,8 @@ from google.cloud import resourcemanager_v3
 from google.iam.v1 import iam_policy_pb2
 from src.utils.logger import Logger
 
-# Common progress bar format for consistent display
-PROGRESS_FORMAT = "{desc:<25}: {percentage:3.0f}%|{bar:30}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
+# Common progress bar format to match table width (120 chars)
+PROGRESS_FORMAT = "{desc:<25}: {percentage:3.0f}%|{bar:65}| {n_fmt:>3}/{total_fmt:<3} [{elapsed}<{remaining}]"
 
 @dataclass
 class Finding:
@@ -191,7 +191,7 @@ class Scanner:
                 # Process current batch with progress bar
                 tasks = []
                 print("\n")  # Add consistent double spacing before progress bar
-                with tqdm(total=len(current_batch), desc="🔍 Storage Buckets", unit="bucket", bar_format=PROGRESS_FORMAT) as pbar:
+                with tqdm(total=len(current_batch), desc="🔍 Storage Buckets    ", unit="bucket", bar_format=PROGRESS_FORMAT) as pbar:
                     for bucket in current_batch:
                         task = asyncio.create_task(self._scan_storage_bucket(bucket, pbar))
                         tasks.append(task)
@@ -232,7 +232,7 @@ class Scanner:
             bindings = [{"role": b.role, "members": list(b.members)} for b in policy.bindings]
             
             print("\n")  # Add consistent double spacing before progress bar
-            with tqdm(total=max(len(bindings), 1), desc="🔍 IAM Bindings", unit="binding", bar_format=PROGRESS_FORMAT) as pbar:
+            with tqdm(total=max(len(bindings), 1), desc="🔍 IAM Bindings      ", unit="binding", bar_format=PROGRESS_FORMAT) as pbar:
                 if not bindings:
                     pbar.update(0)  # Show 0/1 progress for no bindings
                 else:
@@ -288,7 +288,7 @@ class Scanner:
                 instances = json.loads(result.stdout)
 
                 print("\n")  # Add consistent double spacing before progress bar
-                with tqdm(total=len(instances), desc="🔍 Compute Instances", unit="instance", bar_format=PROGRESS_FORMAT) as pbar:
+                with tqdm(total=len(instances), desc="🔍 Compute Instances ", unit="instance", bar_format=PROGRESS_FORMAT) as pbar:
                     for instance in instances:
                         # Skip GKE nodes as per benchmark exception
                         if instance['name'].startswith('gke-') or 'labels' in instance and instance['labels'].get('goog-gke-node'):
@@ -338,7 +338,7 @@ class Scanner:
         try:
             logger = self._get_logger()
             print("\n")  # Add consistent double spacing before progress bar
-            with tqdm(total=1, desc="🔍 Network Config", unit="check", bar_format=PROGRESS_FORMAT) as pbar:
+            with tqdm(total=1, desc="🔍 Network Config    ", unit="check", bar_format=PROGRESS_FORMAT) as pbar:
                 try:
                     # Network scanning logic would go here
                     # For now, just show progress
@@ -355,7 +355,11 @@ class Scanner:
         all_findings = []
         try:
             logger = self._get_logger()
-            print("\n=== Security Scan ===")
+            # Print header with notification systems
+            print("\n=== Cloud Auditor ===")
+            print(f"🔐 Project: {self.project_id}")
+            print("📢 Notifications: 📧 Email, 💬 Slack")
+            print("🎫 Ticketing System: JIRA, ServiceNow")
             
             # Run scans sequentially to maintain order
             try:

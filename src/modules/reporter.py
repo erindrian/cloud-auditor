@@ -43,12 +43,12 @@ class Reporter:
             print("\nNo security findings detected.")
             return
 
-        # Define column widths
+        # Define column widths (total: 120 chars)
         widths = {
             "Resource": 30,
-            "Risk Level": 12,
-            "Finding": 50,
-            "CIS ID": 8
+            "Risk Level": 15,
+            "Finding": 65,
+            "CIS ID": 10
         }
 
         # Print header
@@ -88,12 +88,12 @@ class Reporter:
 
     def _print_compliance_table(self, benchmarks: List[Dict[str, Any]], findings: List[Finding]) -> None:
         """Print CIS benchmark compliance status table."""
-        # Define column widths
+        # Define column widths (total: 120 chars)
         widths = {
-            "CIS ID": 8,
-            "Title": 50,
-            "Level": 10,
-            "Status": 12
+            "CIS ID": 10,
+            "Title": 65,
+            "Level": 15,
+            "Status": 30
         }
 
         # Print header
@@ -132,6 +132,18 @@ class Reporter:
             print(row)
 
         print(bottom_border)
+        
+        # Calculate and display compliance score
+        total_benchmarks = len(benchmarks)
+        compliant_count = total_benchmarks - len(non_compliant_ids)
+        compliance_score = (compliant_count / total_benchmarks) * 100 if total_benchmarks > 0 else 0
+        
+        # Color code the compliance score
+        score_color = "\033[92m" if compliance_score >= 80 else "\033[93m" if compliance_score >= 50 else "\033[91m"
+        
+        print("\nCompliance Summary:")
+        print(f"Score: {score_color}{compliance_score:.1f}%\033[0m")
+        print(f"Status: {compliant_count} compliant, {len(non_compliant_ids)} non-compliant out of {total_benchmarks} benchmarks")
         print(f"\nReport saved to: {self.base_dir}/reports/")
 
     def _save_csv_report(self, findings: List[Dict[str, Any]], timestamp: str) -> str:
@@ -210,8 +222,10 @@ class Reporter:
                     })
             
             # Print findings and compliance tables
-            self._print_findings_table(detailed_findings)
-            self._print_compliance_table(self.benchmarks['cis_benchmarks'], findings)
+            if detailed_findings:
+                self._print_findings_table(detailed_findings)
+            if self.benchmarks['cis_benchmarks']:
+                self._print_compliance_table(self.benchmarks['cis_benchmarks'], findings)
             
             # Create report object
             report = {

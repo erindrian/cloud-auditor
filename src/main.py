@@ -46,8 +46,6 @@ class CloudSecurityAuditor:
     async def run(self) -> None:
         """Run the Cloud Security Auditor."""
         try:
-            self.logger.info("Starting Cloud Security Auditor")
-            
             # Run security scan
             findings = await self.scanner.scan()
             self.logger.info(f"Scanning completed. Found {len(findings)} findings.")
