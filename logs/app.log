@@ -5901,3 +5901,339 @@ to select an already authenticated account to use.
 {"timestamp": "2025-02-09T13:03:35.f" "level": "INFO" "logger": "src.modules.notifier" "message": "All notifications sent successfully" "module": "notifier" "function": "send_notifications" "line": 373 "taskName": "Task-1" "message": "All notifications sent successfully" "asctime": "2025-02-09T13:03:35.f"}
 {"timestamp": "2025-02-09T13:03:35.f" "level": "INFO" "logger": "__main__" "message": "Notifications sent successfully" "module": "main" "function": "run" "line": 59 "taskName": "Task-1" "message": "Notifications sent successfully" "asctime": "2025-02-09T13:03:35.f"}
 {"timestamp": "2025-02-09T13:03:35.f" "level": "INFO" "logger": "__main__" "message": "Cloud Security Auditor completed successfully" "module": "main" "function": "run" "line": 61 "taskName": "Task-1" "message": "Cloud Security Auditor completed successfully" "asctime": "2025-02-09T13:03:35.f"}
+{"timestamp": "2025-02-09T13:07:04.f" "level": "INFO" "logger": "__main__" "message": "Logging initialized successfully" "module": "main" "function": "_setup_logging" "line": 28 "taskName": "None" "message": "Logging initialized successfully" "asctime": "2025-02-09T13:07:04.f"}
+{"timestamp": "2025-02-09T13:07:04.f" "level": "INFO" "logger": "__main__" "message": "GCP credentials initialized successfully" "module": "main" "function": "_setup_credentials" "line": 40 "taskName": "None" "message": "GCP credentials initialized successfully" "asctime": "2025-02-09T13:07:04.f"}
+{"timestamp": "2025-02-09T13:07:04.f" "level": "DEBUG" "logger": "asyncio" "message": "Using selector: KqueueSelector" "module": "selector_events" "function": "__init__" "line": 64 "taskName": "None" "message": "Using selector: KqueueSelector" "asctime": "2025-02-09T13:07:04.f"}
+{"timestamp": "2025-02-09T13:07:04.f" "level": "DEBUG" "logger": "urllib3.util.retry" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "module": "retry" "function": "from_int" "line": 286 "taskName": "Task-1" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "asctime": "2025-02-09T13:07:04.f"}
+{"timestamp": "2025-02-09T13:07:04.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-1" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "asctime": "2025-02-09T13:07:04.f"}
+{"timestamp": "2025-02-09T13:07:05.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-1" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "asctime": "2025-02-09T13:07:05.f"}
+{"timestamp": "2025-02-09T13:07:05.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "taskName": "Task-1" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "asctime": "2025-02-09T13:07:05.f"}
+{"timestamp": "2025-02-09T13:07:05.f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "module": "connectionpool" "function": "_make_request" "line": 544 "taskName": "Task-1" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "asctime": "2025-02-09T13:07:05.f"}
+{"timestamp": "2025-02-09T13:07:06.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "_scan_iam" "line": 260 "taskName": "Task-1" "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "message": "Error in IAM scanning" "asctime": "2025-02-09T13:07:06.f"}
+{"timestamp": "2025-02-09T13:07:06.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "scan" "line": 375 "taskName": "Task-1" "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "message": "Error in IAM scanning" "asctime": "2025-02-09T13:07:06.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "module": "scanner" "function": "_scan_compute" "line": 323 "taskName": "Task-1" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) There was a problem refreshing your current auth tokens: Reauthentication failed. cannot prompt during non-interactive execution.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "_scan_compute" "line": 330 "taskName": "Task-1" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in compute scanning" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in Compute scanning" "module": "scanner" "function": "scan" "line": 384 "taskName": "Task-1" "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in Compute scanning" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "__main__" "message": "Scanning completed. Found 1 findings." "module": "main" "function": "run" "line": 51 "taskName": "Task-1" "message": "Scanning completed. Found 1 findings." "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Generating security audit report" "module": "reporter" "function": "generate_report" "line": 192 "taskName": "Task-1" "message": "Generating security audit report" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "src.modules.reporter" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250209_130707.csv" "module": "reporter" "function": "_save_csv_report" "line": 181 "taskName": "Task-1" "message": "CSV report saved successfully to /Users/erindrian/Desktop/cloud-auditor/reports/compliance_report_20250209_130707.csv" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "src.modules.reporter" "message": "Report generation completed successfully" "module": "reporter" "function": "generate_report" "line": 251 "taskName": "Task-1" "message": "Report generation completed successfully" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "__main__" "message": "Report generated successfully" "module": "main" "function": "run" "line": 55 "taskName": "Task-1" "message": "Report generated successfully" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "WARNING" "logger": "src.modules.notifier" "message": "JIRA package not installed. Install with: pip install jira" "module": "notifier" "function": "_create_jira_issues" "line": 287 "taskName": "Task-3" "message": "JIRA package not installed. Install with: pip install jira" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "WARNING" "logger": "src.modules.notifier" "message": "pysnow package not installed. Install with: pip install pysnow" "module": "notifier" "function": "_create_servicenow_tickets" "line": 322 "taskName": "Task-4" "message": "pysnow package not installed. Install with: pip install pysnow" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "src.modules.notifier" "message": "All notifications sent successfully" "module": "notifier" "function": "send_notifications" "line": 373 "taskName": "Task-1" "message": "All notifications sent successfully" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "__main__" "message": "Notifications sent successfully" "module": "main" "function": "run" "line": 59 "taskName": "Task-1" "message": "Notifications sent successfully" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T13:07:07.f" "level": "INFO" "logger": "__main__" "message": "Cloud Security Auditor completed successfully" "module": "main" "function": "run" "line": 61 "taskName": "Task-1" "message": "Cloud Security Auditor completed successfully" "asctime": "2025-02-09T13:07:07.f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "INFO" "logger": "__main__" "message": "Logging initialized successfully" "module": "main" "function": "_setup_logging" "line": 28 "message": "Logging initialized successfully" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "INFO" "logger": "__main__" "message": "GCP credentials initialized successfully" "module": "main" "function": "_setup_credentials" "line": 40 "message": "GCP credentials initialized successfully" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "DEBUG" "logger": "asyncio" "message": "Using selector: EpollSelector" "module": "selector_events" "function": "__init__" "line": 54 "message": "Using selector: EpollSelector" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "DEBUG" "logger": "urllib3.util.retry" "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "module": "retry" "function": "from_int" "line": 286 "message": "Converted retries value: 3 -> Retry(total=3, connect=None, read=None, redirect=None, status=None)" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "message": "Starting new HTTPS connection (1): oauth2.googleapis.com:443" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "module": "connectionpool" "function": "_make_request" "line": 544 "message": "https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:20.%f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "message": "Starting new HTTPS connection (1): storage.googleapis.com:443" "asctime": "2025-02-09T06:35:20.%f"}
+{"timestamp": "2025-02-09T06:35:21.%f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "module": "connectionpool" "function": "_make_request" "line": 544 "message": "https://storage.googleapis.com:443 "GET /storage/v1/b?maxResults=100&project=test-project-450103&projection=noAcl&prettyPrint=false HTTP/1.1" 200 794" "asctime": "2025-02-09T06:35:21.%f"}
+{"timestamp": "2025-02-09T06:35:22.%f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "_scan_iam" "line": 260 "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "message": "Error in IAM scanning" "asctime": "2025-02-09T06:35:22.%f"}
+{"timestamp": "2025-02-09T06:35:22.%f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in IAM scanning" "module": "scanner" "function": "scan" "line": 375 "error": "403 Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: "SERVICE_DISABLED"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "cloudresourcemanager.googleapis.com"
+}
+metadata {
+  key: "serviceTitle"
+  value: "Cloud Resource Manager API"
+}
+metadata {
+  key: "containerInfo"
+  value: "379849595138"
+}
+metadata {
+  key: "consumer"
+  value: "projects/379849595138"
+}
+metadata {
+  key: "activationUrl"
+  value: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+, locale: "en-US"
+message: "Cloud Resource Manager API has not been used in project 379849595138 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+, links {
+  description: "Google developers console API activation"
+  url: "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=379849595138"
+}
+]" "message": "Error in IAM scanning" "asctime": "2025-02-09T06:35:22.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) You do not currently have an active account selected.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "module": "scanner" "function": "_scan_compute" "line": 323 "message": "Error running gcloud command: ERROR: (gcloud.compute.instances.list) You do not currently have an active account selected.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account, run:
+
+  $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in compute scanning" "module": "scanner" "function": "_scan_compute" "line": 330 "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in compute scanning" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.scanner" "message": "Error in Compute scanning" "module": "scanner" "function": "scan" "line": 384 "error": "Command '['gcloud', 'compute', 'instances', 'list', '--format=json', '--project=test-project-450103']' returned non-zero exit status 1." "message": "Error in Compute scanning" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "INFO" "logger": "__main__" "message": "Scanning completed. Found 1 findings." "module": "main" "function": "run" "line": 51 "message": "Scanning completed. Found 1 findings." "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "INFO" "logger": "src.modules.reporter" "message": "Generating security audit report" "module": "reporter" "function": "generate_report" "line": 192 "message": "Generating security audit report" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "INFO" "logger": "src.modules.reporter" "message": "CSV report saved successfully to /app/reports/compliance_report_20250209_063524.csv" "module": "reporter" "function": "_save_csv_report" "line": 181 "message": "CSV report saved successfully to /app/reports/compliance_report_20250209_063524.csv" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "INFO" "logger": "src.modules.reporter" "message": "Report generation completed successfully" "module": "reporter" "function": "generate_report" "line": 251 "message": "Report generation completed successfully" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "INFO" "logger": "__main__" "message": "Report generated successfully" "module": "main" "function": "run" "line": 55 "message": "Report generated successfully" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.notifier" "message": "Failed to create JIRA issues: Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?" "module": "notifier" "function": "_create_jira_issues" "line": 305 "error": "Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?" "stack_trace": "Traceback (most recent call last):
+  File "/app/src/modules/notifier.py", line 290, in _create_jira_issues
+    jira = JIRA(
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 660, in __init__
+    si = self.server_info()
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 3599, in server_info
+    j = self._get_json("serverInfo")
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 4358, in _get_json
+    else self._session.get(url, params=params)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/jira/resilientsession.py", line 224, in request
+    response = super().request(
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 575, in request
+    prep = self.prepare_request(req)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 484, in prepare_request
+    p.prepare(
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 367, in prepare
+    self.prepare_url(url, params)
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 438, in prepare_url
+    raise MissingSchema(
+requests.exceptions.MissingSchema: Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?
+" "message": "Failed to create JIRA issues: Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "DEBUG" "logger": "pysnow" "message": "(SESSION_CREATE) User: ${SERVICENOW_USERNAME}" "module": "client" "function": "_get_session" "line": 123 "message": "(SESSION_CREATE) User: ${SERVICENOW_USERNAME}" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "DEBUG" "logger": "pysnow" "message": "(RESOURCE_ADD) Object: <Resource [/api/now/table/-incident] at 0xffffb996aaf0>, chunk_size: 8192" "module": "resource" "function": "__init__" "line": 38 "message": "(RESOURCE_ADD) Object: <Resource [/api/now/table/-incident] at 0xffffb996aaf0>, chunk_size: 8192" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "DEBUG" "logger": "pysnow" "message": "(REQUEST_SEND) Method: POST, Resource: <Resource [/api/now/table/-incident] at 0xffffb996aaf0>" "module": "request" "function": "_get_response" "line": 52 "message": "(REQUEST_SEND) Method: POST, Resource: <Resource [/api/now/table/-incident] at 0xffffb996aaf0>" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "DEBUG" "logger": "urllib3.connectionpool" "message": "Starting new HTTPS connection (1): $%7bservicenow_instance_url%7d.service-now.com:443" "module": "connectionpool" "function": "_new_conn" "line": 1049 "message": "Starting new HTTPS connection (1): $%7bservicenow_instance_url%7d.service-now.com:443" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.notifier" "message": "Failed to create ServiceNow tickets: HTTPSConnectionPool(host='$%7bservicenow_instance_url%7d.service-now.com', port=443): Max retries exceeded with url: /api/now/table/-incident?sysparm_query=&sysparm_limit=10000&sysparm_display_value=False&sysparm_suppress_pagination_header=False&sysparm_exclude_reference_link=False&sysparm_view= (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)"))" "module": "notifier" "function": "_create_servicenow_tickets" "line": 343 "error": "HTTPSConnectionPool(host='$%7bservicenow_instance_url%7d.service-now.com', port=443): Max retries exceeded with url: /api/now/table/-incident?sysparm_query=&sysparm_limit=10000&sysparm_display_value=False&sysparm_suppress_pagination_header=False&sysparm_exclude_reference_link=False&sysparm_view= (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)"))" "stack_trace": "Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/usr/local/lib/python3.9/site-packages/urllib3/util/connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File "/usr/local/lib/python3.9/socket.py", line 966, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno -2] Name or service not known
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connection.py", line 704, in connect
+    self.sock = sock = self._new_conn()
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connection.py", line 205, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+  File "/usr/local/lib/python3.9/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='$%7bservicenow_instance_url%7d.service-now.com', port=443): Max retries exceeded with url: /api/now/table/-incident?sysparm_query=&sysparm_limit=10000&sysparm_display_value=False&sysparm_suppress_pagination_header=False&sysparm_exclude_reference_link=False&sysparm_view= (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/src/modules/notifier.py", line 335, in _create_servicenow_tickets
+    result = incident.create(payload=ticket_data)
+  File "/usr/local/lib/python3.9/site-packages/pysnow/resource.py", line 128, in create
+    return self._request.create(payload)
+  File "/usr/local/lib/python3.9/site-packages/pysnow/request.py", line 124, in create
+    return self._get_response("POST", data=json.dumps(payload))
+  File "/usr/local/lib/python3.9/site-packages/pysnow/request.py", line 56, in _get_response
+    response = self._session.request(
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/requests/adapters.py", line 700, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='$%7bservicenow_instance_url%7d.service-now.com', port=443): Max retries exceeded with url: /api/now/table/-incident?sysparm_query=&sysparm_limit=10000&sysparm_display_value=False&sysparm_suppress_pagination_header=False&sysparm_exclude_reference_link=False&sysparm_view= (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)"))
+" "message": "Failed to create ServiceNow tickets: HTTPSConnectionPool(host='$%7bservicenow_instance_url%7d.service-now.com', port=443): Max retries exceeded with url: /api/now/table/-incident?sysparm_query=&sysparm_limit=10000&sysparm_display_value=False&sysparm_suppress_pagination_header=False&sysparm_exclude_reference_link=False&sysparm_view= (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0xffff9250b6a0>: Failed to resolve '$%7bservicenow_instance_url%7d.service-now.com' ([Errno -2] Name or service not known)"))" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "src.modules.notifier" "message": "Error sending notifications" "module": "notifier" "function": "send_notifications" "line": 378 "error": "Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?" "stack_trace": "Traceback (most recent call last):
+  File "/app/src/modules/notifier.py", line 372, in send_notifications
+    await asyncio.gather(*tasks)
+  File "/app/src/modules/notifier.py", line 290, in _create_jira_issues
+    jira = JIRA(
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 660, in __init__
+    si = self.server_info()
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 3599, in server_info
+    j = self._get_json("serverInfo")
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 4358, in _get_json
+    else self._session.get(url, params=params)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/jira/resilientsession.py", line 224, in request
+    response = super().request(
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 575, in request
+    prep = self.prepare_request(req)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 484, in prepare_request
+    p.prepare(
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 367, in prepare
+    self.prepare_url(url, params)
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 438, in prepare_url
+    raise MissingSchema(
+requests.exceptions.MissingSchema: Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?
+" "message": "Error sending notifications" "asctime": "2025-02-09T06:35:24.%f"}
+{"timestamp": "2025-02-09T06:35:24.%f" "level": "ERROR" "logger": "__main__" "message": "Error in main execution" "module": "main" "function": "run" "line": 64 "error": "Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?" "stack_trace": "Traceback (most recent call last):
+  File "/app/src/main.py", line 58, in run
+    await self.notifier.send_notifications(report)
+  File "/app/src/modules/notifier.py", line 372, in send_notifications
+    await asyncio.gather(*tasks)
+  File "/app/src/modules/notifier.py", line 290, in _create_jira_issues
+    jira = JIRA(
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 660, in __init__
+    si = self.server_info()
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 3599, in server_info
+    j = self._get_json("serverInfo")
+  File "/usr/local/lib/python3.9/site-packages/jira/client.py", line 4358, in _get_json
+    else self._session.get(url, params=params)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/jira/resilientsession.py", line 224, in request
+    response = super().request(
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 575, in request
+    prep = self.prepare_request(req)
+  File "/usr/local/lib/python3.9/site-packages/requests/sessions.py", line 484, in prepare_request
+    p.prepare(
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 367, in prepare
+    self.prepare_url(url, params)
+  File "/usr/local/lib/python3.9/site-packages/requests/models.py", line 438, in prepare_url
+    raise MissingSchema(
+requests.exceptions.MissingSchema: Invalid URL '${JIRA_URL}/rest/api/2/serverInfo': No scheme supplied. Perhaps you meant https://${JIRA_URL}/rest/api/2/serverInfo?
+" "message": "Error in main execution" "asctime": "2025-02-09T06:35:24.%f"}

@@ -1,5 +1,0 @@
-Finding Description,CIS Control ID,Profile Applicability,Risk Level,Resource ID,Resource Type,Remediation Steps,Details
-Bucket misconfigured_public_bucket is publicly accessible,5.1,Level 1,High,misconfigured_public_bucket,storage_bucket,"Remove allUsers and allAuthenticatedUsers from the IAM policy of the bucket.
-Use the following commands to remove public access:
-gsutil iam ch -d allUsers gs://BUCKET_NAME
-gsutil iam ch -d allAuthenticatedUsers gs://BUCKET_NAME","{'public_access_prevention': 'inherited', 'uniform_bucket_level_access': False}"
